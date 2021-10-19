@@ -1,0 +1,11 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Exercise-reviewer-eclipse
+Bundle-SymbolicName: exercise-reviewer-eclipse;singleton:=true
+Bundle-Version: 1.0.0.qualifier
+Bundle-Activator: exercise_reviewer_eclipse.Activator
+Require-Bundle: org.eclipse.ui,
+ org.eclipse.core.runtime
+Bundle-RequiredExecutionEnvironment: JavaSE-11
+Automatic-Module-Name: exercise.reviewer.eclipse
+Bundle-ActivationPolicy: lazy
