@@ -7,15 +7,17 @@ import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.handlers.HandlerUtil;
 import org.eclipse.jface.dialogs.MessageDialog;
 
+/**
+ * Sample action.
+ * @author lukas
+ *
+ */
 public class SampleHandler extends AbstractHandler {
 
-	@Override
-	public Object execute(ExecutionEvent event) throws ExecutionException {
-		IWorkbenchWindow window = HandlerUtil.getActiveWorkbenchWindowChecked(event);
-		MessageDialog.openInformation(
-				window.getShell(),
-				"Exercise-reviewer-eclipse",
-				"Hello, Eclipse world");
-		return null;
-	}
+    @Override
+    public Object execute(ExecutionEvent event) throws ExecutionException {
+        IWorkbenchWindow window = HandlerUtil.getActiveWorkbenchWindowChecked(event);
+        MessageDialog.openInformation(window.getShell(), "Exercise-reviewer-eclipse", "Hello, Eclipse world");
+        return null;
+    }
 }
