@@ -3,7 +3,7 @@ Bundle-ManifestVersion: 2
 Bundle-Name: Exercise-reviewer-eclipse
 Bundle-SymbolicName: exercise-reviewer-eclipse;singleton:=true
 Bundle-Version: 1.0.0.qualifier
-Bundle-Activator: exercise_reviewer_eclipse.Activator
+Bundle-Activator: net.ssehub.teaching.exercise_reviewer.eclipse.Activator
 Require-Bundle: org.eclipse.ui,
  org.eclipse.core.runtime
 Bundle-RequiredExecutionEnvironment: JavaSE-11

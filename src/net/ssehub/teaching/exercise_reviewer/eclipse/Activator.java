@@ -1,4 +1,4 @@
-package exercise_reviewer_eclipse;
+package net.ssehub.teaching.exercise_reviewer.eclipse;
 
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
