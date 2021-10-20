@@ -66,6 +66,32 @@
           icon="icons\sample.png"/>
    </extension>
    
+   <extension point="org.eclipse.ui.views">
+        <view id="net.ssehub.teaching.exercise_reviewer.eclipse.views.allreviewablesubmissionsview"
+             name="All reviewable submission View"
+          class="net.ssehub.teaching.exercise_reviewer.eclipse.views.AllReviewableSubmissionsView"
+          icon="icons\sample.png"/>
+   </extension>
+   
+   <extension point="org.eclipse.ui.perspectiveExtensions"> 
+    <perspectiveExtension 
+        targetID="org.eclipse.ui.resourcePerspective"> 
+        <view id="net.ssehub.teaching.exercise_reviewer.eclipse.views.reviewview" 
+            relative="org.eclipse.ui.views.ProgressView" 
+            relationship="left" 
+            ratio="0.50"/> 
+    </perspectiveExtension> 
+</extension> 
+
+    <extension point="org.eclipse.ui.perspectiveExtensions"> 
+        <perspectiveExtension 
+            targetID="org.eclipse.ui.resourcePerspective"> 
+            <view id="net.ssehub.teaching.exercise_reviewer.eclipse.views.allreviewablesubmissionsview" 
+                relative="org.eclipse.ui.views.PackageView" 
+                relationship="left" 
+                ratio="0.50"/> 
+        </perspectiveExtension> 
+    </extension> 
    
 
 </plugin>

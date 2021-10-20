@@ -5,12 +5,16 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.ui.part.ViewPart;
 
 /**
+ * This class displays information and you can score and give additional assessment.
  * 
  * @author lukas
  *
  */
 public class ReviewView extends ViewPart {
     private Label label;
+    /**
+     * Creates an instance of the ReviewView class.
+     */
     public ReviewView() {
         super();
     }
@@ -24,7 +28,7 @@ public class ReviewView extends ViewPart {
 
     @Override
     public void setFocus() {
-       label.setFocus();
+        label.setFocus();
         
     }
 
