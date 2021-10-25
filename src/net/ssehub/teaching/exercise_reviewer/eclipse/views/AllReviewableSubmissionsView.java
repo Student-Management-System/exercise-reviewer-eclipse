@@ -7,6 +7,7 @@ import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
@@ -17,6 +18,7 @@ import org.osgi.framework.Bundle;
 
 import net.ssehub.teaching.exercise_reviewer.eclipse.Activator;
 import net.ssehub.teaching.exercise_reviewer.eclipse.background.ListSubmissionsJob;
+import net.ssehub.teaching.exercise_reviewer.lib.data.Submission;
 
 /**
  * This class creates the {@link AllReviewableSubmissionsView} which contains a
@@ -95,10 +97,14 @@ public class AllReviewableSubmissionsView extends ViewPart {
      * @param parent
      */
     private void createComponent(Composite parent) {
+        FillLayout fillLayout = new FillLayout(SWT.VERTICAL);
+        parent.setLayout(fillLayout);
         this.swtList = new List(parent, SWT.BORDER | SWT.V_SCROLL | SWT.SINGLE);
-
         this.combo = new Combo(parent, SWT.DROP_DOWN | SWT.READ_ONLY | SWT.SIMPLE);
+        
+        
 
+//        Submission
         this.combo.add("test");
         this.combo.pack();
 
@@ -133,10 +139,10 @@ public class AllReviewableSubmissionsView extends ViewPart {
      * @param job
      */
     private void onListSubmissionFinished(ListSubmissionsJob job) {
-        java.util.List<String> submissionlist = job.getSubmissionList();
+        java.util.List<Submission> submissionlist = job.getSubmissionList();
         Display.getDefault().syncExec(() -> {
-            for (String element : submissionlist) {
-                this.swtList.add(element);
+            for (Submission element : submissionlist) {
+                this.swtList.add(element.getUserDisplayName());
             }
 
         });

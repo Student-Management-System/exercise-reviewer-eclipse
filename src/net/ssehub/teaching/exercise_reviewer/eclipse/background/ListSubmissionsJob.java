@@ -14,6 +14,8 @@ import org.eclipse.core.runtime.jobs.ILock;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.swt.widgets.Display;
 
+import net.ssehub.teaching.exercise_reviewer.lib.data.Submission;
+
 /**
  * sds.
  * 
@@ -60,11 +62,15 @@ public class ListSubmissionsJob extends Job {
      * 
      * @return List<String>
      */
-    public List<String> getSubmissionList() {
-        List<String> list = new ArrayList<String>();
+    public List<Submission> getSubmissionList() {
+        List<Submission> list = new ArrayList<Submission>();
+        
 
         for (int i = 0; i < 100; i++) {
-            list.add("Submission " + Integer.toString(i));
+            Submission submission = new Submission("assignmentid:" + Integer.toString(i),
+                    "userid:" + Integer.toString(i), "displayname:" + Integer.toString(i), 
+                    "date:" + Integer.toString(i));
+            list.add(submission);
         }
 
         return list;
