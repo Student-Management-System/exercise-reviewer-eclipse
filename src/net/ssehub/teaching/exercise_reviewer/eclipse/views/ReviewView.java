@@ -8,6 +8,8 @@ import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.ui.part.ViewPart;
 
+import net.ssehub.teaching.exercise_reviewer.lib.data.Submission;
+
 /**
  * This class displays information and you can score and give additional assessment.
  * 
@@ -16,6 +18,9 @@ import org.eclipse.ui.part.ViewPart;
  */
 public class ReviewView extends ViewPart {
     private Label label;
+    
+    private Label labelUsers;
+    private Label labelProject;
     /**
      * Creates an instance of the ReviewView class.
      */
@@ -54,21 +59,21 @@ public class ReviewView extends ViewPart {
         gridData.horizontalSpan = 1;
         label.setLayoutData(gridData);
 
-//        labelProject = new Label(group, 0);
-//        gridData = new GridData(GridData.HORIZONTAL_ALIGN_FILL);
-//        gridData.horizontalSpan = 1;
-//        labelProject.setLayoutData(gridData);
+        labelProject = new Label(group, 0);
+        gridData = new GridData(GridData.HORIZONTAL_ALIGN_FILL);
+        gridData.horizontalSpan = 1;
+        labelProject.setLayoutData(gridData);
         
         label = new Label(group, 0);
         label.setText("User(s):");
         gridData = new GridData(GridData.BEGINNING);
         gridData.horizontalSpan = 1;
         label.setLayoutData(gridData);
-//
-//        labelUsers = new Label(group, 0);
-//        gridData = new GridData(GridData.HORIZONTAL_ALIGN_FILL);
-//        gridData.horizontalSpan = 1;
-//        labelUsers.setLayoutData(gridData);
+
+        labelUsers = new Label(group, 0);
+        gridData = new GridData(GridData.HORIZONTAL_ALIGN_FILL);
+        gridData.horizontalSpan = 1;
+        labelUsers.setLayoutData(gridData);
 
         Label labelReview = new Label(group, 0);
         labelReview.setText("Review:");
@@ -89,7 +94,7 @@ public class ReviewView extends ViewPart {
 //        gridData.widthHint = 400;
 //        gridData.horizontalSpan = 2;
 //        review.setLayoutData(gridData);
-//
+
 //        labelCredits = new Label(group, 0);
 //        gridData = new GridData(GridData.HORIZONTAL_ALIGN_BEGINNING);
 //        gridData.horizontalSpan = 1;
@@ -101,6 +106,16 @@ public class ReviewView extends ViewPart {
 //        gridData = new GridData(GridData.HORIZONTAL_ALIGN_END);
 //        gridData.horizontalSpan = 1;
 //        credits.setLayoutData(gridData);
+    }
+    /**
+     * Refreshes the review data with the current submission.
+     * @param submission
+     */
+    public void refreshReviewInformation(Submission submission) {
+        this.labelProject.setText("");
+        this.labelUsers.setText(submission.getUserDisplayName());
+        
+        this.labelUsers.pack();
     }
 
 }
