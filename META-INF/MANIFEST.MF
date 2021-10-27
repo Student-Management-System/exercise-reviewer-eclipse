@@ -5,9 +5,11 @@ Bundle-SymbolicName: exercise-reviewer-eclipse;singleton:=true
 Bundle-Version: 0.0.1.qualifier
 Bundle-Activator: net.ssehub.teaching.exercise_reviewer.eclipse.Activator
 Require-Bundle: org.eclipse.ui,
- org.eclipse.core.runtime
+ org.eclipse.core.runtime,
+ org.eclipse.core.resources
 Bundle-RequiredExecutionEnvironment: JavaSE-11
 Automatic-Module-Name: exercise.reviewer.eclipse
 Bundle-ClassPath: .,
  target/dependency/exercise-submitter-lib-jar-with-dependencies.jar
 Bundle-ActivationPolicy: lazy
+
