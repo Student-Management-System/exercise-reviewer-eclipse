@@ -1,4 +1,4 @@
-package net.ssehub.teaching.exercise_reviewer.eclipse.handlers;
+package net.ssehub.teaching.exercise_reviewer.eclipse.actions;
 
 import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
