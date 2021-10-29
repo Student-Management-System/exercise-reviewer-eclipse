@@ -118,6 +118,9 @@ public class ReviewView extends ViewPart {
 //        gridData.horizontalSpan = 1;
 //        credits.setLayoutData(gridData);
     }
+    /**
+     * Creates the selection listener.
+     */
     private void createSelectionListener() {    
         getSite().getWorkbenchWindow().getSelectionService().addPostSelectionListener(listener);
     }

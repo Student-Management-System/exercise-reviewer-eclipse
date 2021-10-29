@@ -13,6 +13,11 @@ import org.eclipse.ui.PlatformUI;
 import net.ssehub.teaching.exercise_reviewer.eclipse.views.ReviewView;
 import net.ssehub.teaching.exercise_reviewer.lib.data.Submission;
 
+/**
+ * This class handles the project change selection event.
+ * @author lukas
+ *
+ */
 public class ProjectSelectionListener implements ISelectionListener {
 
     @Override
