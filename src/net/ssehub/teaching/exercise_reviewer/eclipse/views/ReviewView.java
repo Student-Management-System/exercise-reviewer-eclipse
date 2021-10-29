@@ -6,8 +6,10 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.ui.ISelectionListener;
 import org.eclipse.ui.part.ViewPart;
 
+import net.ssehub.teaching.exercise_reviewer.eclipse.listener.ProjectSelectionListener;
 import net.ssehub.teaching.exercise_reviewer.lib.data.Submission;
 
 /**
@@ -21,6 +23,8 @@ public class ReviewView extends ViewPart {
     
     private Label labelUsers;
     private Label labelProject;
+    
+    private ISelectionListener listener = new ProjectSelectionListener();
     /**
      * Creates an instance of the ReviewView class.
      */
@@ -34,6 +38,7 @@ public class ReviewView extends ViewPart {
         label.setText("Hello World");
         
         createReviewInformation(parent);
+        createSelectionListener();
         
     }
 
@@ -41,6 +46,12 @@ public class ReviewView extends ViewPart {
     public void setFocus() {
         label.setFocus();
         
+    }
+    @Override
+    public void dispose() {
+        // important: We need do unregister our listener when the view is disposed
+        getSite().getWorkbenchWindow().getSelectionService().removeSelectionListener(listener);
+        super.dispose();
     }
     /**
      * Creates the reviewinfo screen.
@@ -106,6 +117,9 @@ public class ReviewView extends ViewPart {
 //        gridData = new GridData(GridData.HORIZONTAL_ALIGN_END);
 //        gridData.horizontalSpan = 1;
 //        credits.setLayoutData(gridData);
+    }
+    private void createSelectionListener() {    
+        getSite().getWorkbenchWindow().getSelectionService().addPostSelectionListener(listener);
     }
     /**
      * Refreshes the review data with the current submission.
