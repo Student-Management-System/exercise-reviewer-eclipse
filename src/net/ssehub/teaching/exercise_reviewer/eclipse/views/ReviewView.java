@@ -10,7 +10,7 @@ import org.eclipse.ui.ISelectionListener;
 import org.eclipse.ui.part.ViewPart;
 
 import net.ssehub.teaching.exercise_reviewer.eclipse.listener.ProjectSelectionListener;
-import net.ssehub.teaching.exercise_reviewer.lib.data.Submission;
+import net.ssehub.teaching.exercise_reviewer.lib.data.Assessment;
 
 /**
  * This class displays information and you can score and give additional assessment.
@@ -126,11 +126,11 @@ public class ReviewView extends ViewPart {
     }
     /**
      * Refreshes the review data with the current submission.
-     * @param submission
+     * @param assessment
      */
-    public void refreshReviewInformation(Submission submission) {
+    public void refreshReviewInformation(Assessment assessment) {
         this.labelProject.setText("");
-        this.labelUsers.setText(submission.getUserDisplayName());
+        this.labelUsers.setText(assessment.getAssessmentId());
         
         this.labelUsers.pack();
     }
