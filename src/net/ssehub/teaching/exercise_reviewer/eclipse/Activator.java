@@ -57,10 +57,9 @@ public class Activator extends AbstractUIPlugin {
             Properties prop = new Properties();
             prop.load(Activator.class.getClassLoader().getResourceAsStream("/config/config.properties"));
             //TODO remove hardcoded login
-            Reviewer reviewer = new Reviewer(null, "adam", "123456", "java-wise2021");
+            Reviewer reviewer = new Reviewer("adam", "123456", "java-wise2021", prop.getProperty("mgmturl"),
+                    prop.getProperty("authurl"));
             reviewer
-            .withAuthUrl(prop.getProperty("authurl"))
-            .withMgmtUrl(prop.getProperty("mgmturl"))
                 .withExerciseSubmitterServerUrl(prop.getProperty("exerciseSubmitterUrl"));
            
             this.reviewer = reviewer;
