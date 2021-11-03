@@ -1,5 +1,8 @@
 package net.ssehub.teaching.exercise_reviewer.eclipse.views;
 
+import java.io.IOException;
+import java.util.function.Supplier;
+
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
@@ -131,6 +134,7 @@ public class ReviewView extends ViewPart {
     public void refreshReviewInformation(Assessment assessment) {
         this.labelProject.setText("");
         this.labelUsers.setText(assessment.getAssessmentId());
+        
         
         this.labelUsers.pack();
     }

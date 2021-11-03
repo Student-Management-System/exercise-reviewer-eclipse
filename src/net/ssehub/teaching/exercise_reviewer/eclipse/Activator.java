@@ -3,16 +3,11 @@ package net.ssehub.teaching.exercise_reviewer.eclipse;
 import java.io.IOException;
 import java.util.Properties;
 
-import org.eclipse.core.resources.IResourceChangeListener;
-import org.eclipse.core.resources.IWorkspace;
-import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
 
 import net.ssehub.teaching.exercise_reviewer.eclipse.dialog.AdvancedExceptionDialog;
 import net.ssehub.teaching.exercise_reviewer.lib.Reviewer;
-import net.ssehub.teaching.exercise_submitter.lib.ExerciseSubmitterFactory;
-import net.ssehub.teaching.exercise_submitter.lib.ExerciseSubmitterManager;
 import net.ssehub.teaching.exercise_submitter.lib.student_management_system.ApiException;
 import net.ssehub.teaching.exercise_submitter.lib.student_management_system.AuthenticationException;
 import net.ssehub.teaching.exercise_submitter.lib.student_management_system.NetworkException;
@@ -28,7 +23,7 @@ public class Activator extends AbstractUIPlugin {
 
     // The shared instance
     private static Activator plugin;
-    
+
     private Reviewer reviewer;
 
     /**
@@ -48,25 +43,24 @@ public class Activator extends AbstractUIPlugin {
         plugin = null;
         super.stop(context);
     }
+
     /**
      * Inits the reviewer.
      */
     public synchronized void initReviewer() {
         try {
-            
+
             Properties prop = new Properties();
             prop.load(Activator.class.getClassLoader().getResourceAsStream("/config/config.properties"));
-            //TODO remove hardcoded login
+            // TODO remove hardcoded login
             Reviewer reviewer = new Reviewer("adam", "123456", "java-wise2021", prop.getProperty("mgmturl"),
                     prop.getProperty("authurl"));
-            reviewer
-                .withExerciseSubmitterServerUrl(prop.getProperty("exerciseSubmitterUrl"));
-           
+            reviewer.withExerciseSubmitterServerUrl(prop.getProperty("exerciseSubmitterUrl"));
+
             this.reviewer = reviewer;
-            
+
         } catch (NetworkException e) {
-            AdvancedExceptionDialog.showUnexpectedExceptionDialog(e,
-                "Failed to connect to student management system");
+            AdvancedExceptionDialog.showUnexpectedExceptionDialog(e, "Failed to connect to student management system");
             // TODO: more user-friendly dialog?
         } catch (UserNotInCourseException e) {
             AdvancedExceptionDialog.showUnexpectedExceptionDialog(e,
@@ -81,17 +75,19 @@ public class Activator extends AbstractUIPlugin {
             AdvancedExceptionDialog.showUnexpectedExceptionDialog(e, "Cant read config file");
         }
     }
-    
+
     /**
      * Gets the reviewer or creates if not existing.
+     *
      * @return Reviewer
      */
     public synchronized Reviewer getReviewer() {
-        if (reviewer == null) {
-            initReviewer();
+        if (this.reviewer == null) {
+            this.initReviewer();
         }
-        // TODO: this returns null if init failed and thus causes NullPointerExceptions all over the place
-        return reviewer;
+        // TODO: this returns null if init failed and thus causes NullPointerExceptions
+        // all over the place
+        return this.reviewer;
     }
 
     /**
