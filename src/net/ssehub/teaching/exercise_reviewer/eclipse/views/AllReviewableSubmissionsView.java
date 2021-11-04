@@ -1,6 +1,7 @@
 package net.ssehub.teaching.exercise_reviewer.eclipse.views;
 
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.Optional;
 
 import org.eclipse.core.runtime.Platform;
@@ -30,7 +31,6 @@ import org.osgi.framework.Bundle;
 import net.ssehub.teaching.exercise_reviewer.eclipse.Activator;
 import net.ssehub.teaching.exercise_reviewer.eclipse.background.ListSubmissionsJob;
 import net.ssehub.teaching.exercise_reviewer.eclipse.dialog.AdvancedExceptionDialog;
-import net.ssehub.teaching.exercise_reviewer.lib.data.Assessment;
 import net.ssehub.teaching.exercise_submitter.lib.data.Assignment;
 import net.ssehub.teaching.exercise_submitter.lib.student_management_system.ApiException;
 
@@ -47,7 +47,7 @@ public class AllReviewableSubmissionsView extends ViewPart {
     private Action downloadAllSubmissionAction;
     private List swtList;
 
-    private Optional<java.util.List<Assessment>> submissionlist = Optional.empty();
+    private Optional<java.util.List<String>> groupNames = Optional.empty();
     private Optional<java.util.List<Assignment>> assignments = Optional.empty();
     private Optional<Assignment> selectedAssignment = Optional.empty();
 
@@ -130,12 +130,12 @@ public class AllReviewableSubmissionsView extends ViewPart {
                     ReviewView reviewview = (ReviewView) PlatformUI.getWorkbench().getActiveWorkbenchWindow()
                             .getActivePage().showView("net.ssehub.teaching.exercise_reviewer.eclipse.views.reviewview");
 
-                    if (AllReviewableSubmissionsView.this.submissionlist.isPresent()) {
+                    if (AllReviewableSubmissionsView.this.groupNames.isPresent()) {
                         int selected = AllReviewableSubmissionsView.this.swtList.getSelectionIndex();
                         if (!(selected < 0 || selected >= AllReviewableSubmissionsView.this.swtList.getItemCount())) {
 
-                            reviewview.refreshReviewInformation(
-                                    AllReviewableSubmissionsView.this.submissionlist.get().get(selected));
+                            reviewview.refreshReviewInformation(groupNames.get().get(selected),
+                                    selectedAssignment.get());
                         }
                     }
                 } catch (PartInitException e) {
@@ -262,9 +262,7 @@ public class AllReviewableSubmissionsView extends ViewPart {
     private void retrieveAssignments() {
         // TODO maybe as a background job too
         try {
-            if (Activator.getDefault().getReviewer() != null) {
-                this.assignments = Optional.ofNullable(Activator.getDefault().getReviewer().getAllAssignments());
-            }
+            this.assignments = Optional.ofNullable(Activator.getDefault().getManager().getAllAssignments());
 
         } catch (ApiException e) {
             AdvancedExceptionDialog.showUnexpectedExceptionDialog(e, "Cant retrieve assignments");
@@ -287,11 +285,11 @@ public class AllReviewableSubmissionsView extends ViewPart {
      * @param job
      */
     private void onListSubmissionFinished(ListSubmissionsJob job) {
-        this.submissionlist = job.getAssessmentList();
-        if (this.submissionlist.isPresent()) {
+        this.groupNames = job.getGroupNames().map(set -> new ArrayList<>(set));
+        if (this.groupNames.isPresent()) {
             Display.getDefault().syncExec(() -> {
-                for (Assessment element : this.submissionlist.get()) {
-                    this.swtList.add(element.getAssessmentId());
+                for (String groupName : this.groupNames.get()) {
+                    this.swtList.add(groupName);
                 }
 
             });

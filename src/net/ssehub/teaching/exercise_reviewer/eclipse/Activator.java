@@ -7,7 +7,9 @@ import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
 
 import net.ssehub.teaching.exercise_reviewer.eclipse.dialog.AdvancedExceptionDialog;
-import net.ssehub.teaching.exercise_reviewer.lib.Reviewer;
+import net.ssehub.teaching.exercise_reviewer.eclipse.log.EclipseLog;
+import net.ssehub.teaching.exercise_submitter.lib.ExerciseSubmitterFactory;
+import net.ssehub.teaching.exercise_submitter.lib.ExerciseSubmitterManager;
 import net.ssehub.teaching.exercise_submitter.lib.student_management_system.ApiException;
 import net.ssehub.teaching.exercise_submitter.lib.student_management_system.AuthenticationException;
 import net.ssehub.teaching.exercise_submitter.lib.student_management_system.NetworkException;
@@ -24,7 +26,7 @@ public class Activator extends AbstractUIPlugin {
     // The shared instance
     private static Activator plugin;
 
-    private Reviewer reviewer;
+    private ExerciseSubmitterManager manager;
 
     /**
      * Creates an instance of the Activator.
@@ -44,21 +46,34 @@ public class Activator extends AbstractUIPlugin {
         super.stop(context);
     }
 
+    
     /**
-     * Inits the reviewer.
+     * Initializes the {@link ExerciseSubmitterManager} with the username and password from the preference store.
+     * <p>
+     * May be called multiple times, if the username or password in the preference store change.
      */
-    public synchronized void initReviewer() {
+    public synchronized void initManager() {
         try {
-
+            
             Properties prop = new Properties();
-            prop.load(Activator.class.getClassLoader().getResourceAsStream("/config/config.properties"));
-            // TODO remove hardcoded login
-            Reviewer reviewer = new Reviewer("adam", "123456", "java-wise2021", prop.getProperty("mgmturl"),
-                    prop.getProperty("authurl"));
-            reviewer.withExerciseSubmitterServerUrl(prop.getProperty("exerciseSubmitterUrl"));
-
-            this.reviewer = reviewer;
-
+            prop.load(Activator.class.getResourceAsStream("config.properties"));
+            
+            String username = "adam"; // PreferencePage.SECURE_PREFERENCES.get(PreferencePage.KEY_USERNAME, ""); TODO
+            String password = "123456"; // PreferencePage.SECURE_PREFERENCES.get(PreferencePage.KEY_PASSWORD, "");
+            
+            EclipseLog.info("Creating manager with username " + username);
+            ExerciseSubmitterFactory factory = new ExerciseSubmitterFactory();
+            factory
+                    .withUsername(username)
+                    .withPassword(password)
+                    .withCourse("java-wise2021") // TODO: get course from config
+                    .withAuthUrl(prop.getProperty("authurl"))
+                    .withMgmtUrl(prop.getProperty("mgmturl"))
+                    .withExerciseSubmitterServerUrl(prop.getProperty("exerciseSubmitterUrl"));
+            manager = factory.build();
+            
+//        } catch (StorageException ex) {
+//            AdvancedExceptionDialog.showUnexpectedExceptionDialog(ex, "Failed to load login data from preferences");
         } catch (NetworkException e) {
             AdvancedExceptionDialog.showUnexpectedExceptionDialog(e, "Failed to connect to student management system");
             // TODO: more user-friendly dialog?
@@ -75,20 +90,29 @@ public class Activator extends AbstractUIPlugin {
             AdvancedExceptionDialog.showUnexpectedExceptionDialog(e, "Cant read config file");
         }
     }
-
+    
     /**
-     * Gets the reviewer or creates if not existing.
-     *
-     * @return Reviewer
+     * Returns the {@link ExerciseSubmitterManager}. Manager is lazily initialized.
+     * 
+     * @return The {@link ExerciseSubmitterManager}.
      */
-    public synchronized Reviewer getReviewer() {
-        if (this.reviewer == null) {
-            this.initReviewer();
+    public synchronized ExerciseSubmitterManager getManager() {
+        if (manager == null) {
+            initManager();
         }
-        // TODO: this returns null if init failed and thus causes NullPointerExceptions
-        // all over the place
-        return this.reviewer;
+        // TODO: this returns null if init failed and thus causes NullPointerExceptions all over the place
+        return manager;
     }
+    
+    /**
+     * Checks whether the {@link ExerciseSubmitterManager} is initialized.
+     * 
+     * @return Whether the manager is intialized.
+     */
+    public synchronized boolean isManagerInitialized() {
+        return manager != null;
+    }
+    
 
     /**
      * Returns the shared instance.

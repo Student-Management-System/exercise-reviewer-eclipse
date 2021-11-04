@@ -1,7 +1,7 @@
 package net.ssehub.teaching.exercise_reviewer.eclipse.background;
 
-import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.function.Consumer;
 
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -15,8 +15,7 @@ import org.eclipse.swt.widgets.Shell;
 
 import net.ssehub.teaching.exercise_reviewer.eclipse.Activator;
 import net.ssehub.teaching.exercise_reviewer.eclipse.dialog.AdvancedExceptionDialog;
-import net.ssehub.teaching.exercise_reviewer.lib.Reviewer;
-import net.ssehub.teaching.exercise_reviewer.lib.data.Assessment;
+import net.ssehub.teaching.exercise_submitter.lib.ExerciseSubmitterManager;
 import net.ssehub.teaching.exercise_submitter.lib.data.Assignment;
 import net.ssehub.teaching.exercise_submitter.lib.student_management_system.ApiException;
 
@@ -31,7 +30,7 @@ public class ListSubmissionsJob extends Job {
     private static ILock lock = Job.getJobManager().newLock();
     private Shell shell;
     private Consumer<ListSubmissionsJob> callbackCheckSubmission;
-    private Optional<List<Assessment>> assessmentlist = Optional.empty();
+    private Optional<Set<String>> groupNames = Optional.empty();
 
     private Assignment currentAssignment;
 
@@ -72,28 +71,29 @@ public class ListSubmissionsJob extends Job {
      */
     private void retrieveAssessmentList() {
 
-        Reviewer reviewer = Activator.getDefault().getReviewer();
+        ExerciseSubmitterManager manager = Activator.getDefault().getManager();
 
         try {
-            this.assessmentlist = Optional.ofNullable(reviewer.getAllSubmissionsFromAssignment(this.currentAssignment));
-//            Display.getCurrent().asyncExec(() -> {
-//                //TODO: get shell
-//                MessageDialog.openInformation(new Shell(), getName(), getName());
-//            });
+            this.groupNames = Optional.of(manager.getStudentManagementConnection()
+                    .getAllGroups(manager.getCourse(), currentAssignment));
+            
+            shell.getDisplay().asyncExec(() -> {
+                MessageDialog.openInformation(shell, getName(), getName());
+            });
 
         } catch (ApiException e) {
             Display.getCurrent().syncExec(
-                () -> AdvancedExceptionDialog.showUnexpectedExceptionDialog(e, "Cant retrieve assessment list"));
+                () -> AdvancedExceptionDialog.showUnexpectedExceptionDialog(e, "Cant retrieve group list"));
         }
     }
 
     /**
-     * Return the submissionlist retrieved from the server.
+     * Return the group list retrieved from the server.
      *
      * @return List<String>
      */
-    public Optional<List<Assessment>> getAssessmentList() {
-        return this.assessmentlist;
+    public Optional<Set<String>> getGroupNames() {
+        return this.groupNames;
     }
 
 }

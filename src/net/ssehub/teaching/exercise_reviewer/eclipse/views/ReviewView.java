@@ -18,8 +18,7 @@ import org.eclipse.ui.part.ViewPart;
 
 import net.ssehub.teaching.exercise_reviewer.eclipse.dialog.AdvancedExceptionDialog;
 import net.ssehub.teaching.exercise_reviewer.eclipse.listener.ProjectSelectionListener;
-import net.ssehub.teaching.exercise_reviewer.lib.data.Assessment;
-import net.ssehub.teaching.exercise_reviewer.lib.data.User;
+import net.ssehub.teaching.exercise_submitter.lib.data.Assignment;
 
 /**
  * This class displays information and you can score and give additional
@@ -180,15 +179,16 @@ public class ReviewView extends ViewPart {
     /**
      * Refreshes the review data with the current submission.
      *
-     * @param assessment
+     * @param groupName
+     * @param assignment 
      */
-    public void refreshReviewInformation(Assessment assessment) {
-        this.labelProject.setText(assessment.getAssignment().getName());
+    public void refreshReviewInformation(String groupName, Assignment assignment) {
+        this.labelProject.setText(assignment.getName());
 
-        this.labelUsers.setText(assessment.getUser()
-                .orElse(new User("not available", "not available", "not available", "not available")).getDisplayname());
+        this.labelUsers.setText(groupName);
 
-        this.comment = Optional.ofNullable(new Comment(assessment.getComment().orElse("not available")));
+        // TODO: fetch from student management system
+        this.comment = Optional.of(new Comment("not available yet"));
 
         this.labelProject.pack();
         this.labelUsers.pack();

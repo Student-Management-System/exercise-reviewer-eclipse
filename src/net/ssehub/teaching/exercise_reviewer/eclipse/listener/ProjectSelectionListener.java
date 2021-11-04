@@ -11,7 +11,6 @@ import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 
 import net.ssehub.teaching.exercise_reviewer.eclipse.views.ReviewView;
-import net.ssehub.teaching.exercise_reviewer.lib.data.Assessment;
 
 /**
  * This class handles the project change selection event.
@@ -26,7 +25,7 @@ public class ProjectSelectionListener implements ISelectionListener {
         if (newSelection instanceof IStructuredSelection) {
             Object element = ((IStructuredSelection) newSelection).getFirstElement();
             if (element instanceof IAdaptable) {
-                IResource resource = (IResource) ((IAdaptable) element).getAdapter(IResource.class);
+                IResource resource = ((IAdaptable) element).getAdapter(IResource.class);
                 final IProject project = resource.getProject();
 
                 try {
@@ -34,7 +33,7 @@ public class ProjectSelectionListener implements ISelectionListener {
                     //TODO need to change
                     ReviewView reviewview = (ReviewView) PlatformUI.getWorkbench().getActiveWorkbenchWindow()
                             .getActivePage().showView("net.ssehub.teaching.exercise_reviewer.eclipse.views.reviewview");
-                    reviewview.refreshReviewInformation(new Assessment(project.getName(), null, false));
+                    reviewview.refreshReviewInformation(project.getName(), null /* TODO: get current assignment */);
                 } catch (PartInitException e) {
                     // TODO Auto-generated catch block
                     e.printStackTrace();
