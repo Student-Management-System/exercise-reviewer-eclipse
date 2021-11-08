@@ -11,6 +11,8 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Table;
+import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.ISelectionListener;
 import org.eclipse.ui.PartInitException;
@@ -28,14 +30,15 @@ import net.ssehub.teaching.exercise_submitter.lib.data.Assignment;
  *
  */
 public class ReviewView extends ViewPart {
-    private Label label;
+    
 
     private Label labelUsers;
     private Label labelProject;
 
-    private Text reviewinput;
 
     private Button reviewButton;
+
+    private Table table;
 
     private Optional<Comment> comment = Optional.empty();
 
@@ -50,17 +53,40 @@ public class ReviewView extends ViewPart {
 
     @Override
     public void createPartControl(Composite parent) {
-        this.label = new Label(parent, 0);
-        this.label.setText("Hello World");
+
+        createProblemTable(parent);
 
         this.createReviewInformation(parent);
         this.createSelectionListener();
 
     }
+    /**
+     * Creates the problem table.
+     * @param parent
+     */
+    private void createProblemTable(Composite parent) {
+        table = new Table(parent, SWT.BORDER | SWT.H_SCROLL | SWT.V_SCROLL);
+        table.setLinesVisible(true);
+        table.setHeaderVisible(true);
+
+        String[] columns = {"Type", "Description", "Resource", "Path", "Line"};
+
+        for (int i = 0; i < columns.length; i++) {
+            TableColumn tc = new TableColumn(table, SWT.LEFT);
+            tc.setText(columns[i]);
+        }
+
+        for (int i = 0; i < table.getColumnCount(); i++) {
+            table.getColumn(i).pack();
+        }
+        
+        
+        
+    }
 
     @Override
     public void setFocus() {
-        this.label.setFocus();
+       
 
     }
 
@@ -180,7 +206,7 @@ public class ReviewView extends ViewPart {
      * Refreshes the review data with the current submission.
      *
      * @param groupName
-     * @param assignment 
+     * @param assignment
      */
     public void refreshReviewInformation(String groupName, Assignment assignment) {
         this.labelProject.setText(assignment.getName());
@@ -189,6 +215,9 @@ public class ReviewView extends ViewPart {
 
         // TODO: fetch from student management system
         this.comment = Optional.of(new Comment("not available yet"));
+        
+        //create problems
+        
 
         this.labelProject.pack();
         this.labelUsers.pack();
