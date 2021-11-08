@@ -77,12 +77,12 @@ public class ListSubmissionsJob extends Job {
             this.groupNames = Optional.of(manager.getStudentManagementConnection()
                     .getAllGroups(manager.getCourse(), currentAssignment));
             
-            shell.getDisplay().asyncExec(() -> {
-                MessageDialog.openInformation(shell, getName(), getName());
+            Display.getDefault().asyncExec(() -> {
+                MessageDialog.openInformation(shell, getName(), "Retrieved ");
             });
 
         } catch (ApiException e) {
-            Display.getCurrent().syncExec(
+            Display.getDefault().syncExec(
                 () -> AdvancedExceptionDialog.showUnexpectedExceptionDialog(e, "Cant retrieve group list"));
         }
     }
