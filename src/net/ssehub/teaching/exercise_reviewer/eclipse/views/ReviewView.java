@@ -9,18 +9,28 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
-import org.eclipse.swt.widgets.Text;
+import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.ui.ISelectionListener;
+import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.PartInitException;
+import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.part.ViewPart;
 
+import net.ssehub.teaching.exercise_reviewer.eclipse.Activator;
+import net.ssehub.teaching.exercise_reviewer.eclipse.background.IRunnableStuMgmt;
+import net.ssehub.teaching.exercise_reviewer.eclipse.background.StuMgmtJob;
 import net.ssehub.teaching.exercise_reviewer.eclipse.dialog.AdvancedExceptionDialog;
 import net.ssehub.teaching.exercise_reviewer.eclipse.listener.ProjectSelectionListener;
+import net.ssehub.teaching.exercise_submitter.lib.ExerciseSubmitterManager;
+import net.ssehub.teaching.exercise_submitter.lib.data.Assessment;
 import net.ssehub.teaching.exercise_submitter.lib.data.Assignment;
+import net.ssehub.teaching.exercise_submitter.lib.student_management_system.ApiException;
+import net.ssehub.teaching.exercise_submitter.lib.submission.Problem;
 
 /**
  * This class displays information and you can score and give additional
@@ -30,11 +40,11 @@ import net.ssehub.teaching.exercise_submitter.lib.data.Assignment;
  *
  */
 public class ReviewView extends ViewPart {
-    
+
+    private static IWorkbenchPage page = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
 
     private Label labelUsers;
     private Label labelProject;
-
 
     private Button reviewButton;
 
@@ -54,39 +64,38 @@ public class ReviewView extends ViewPart {
     @Override
     public void createPartControl(Composite parent) {
 
-        createProblemTable(parent);
+        this.createProblemTable(parent);
 
         this.createReviewInformation(parent);
         this.createSelectionListener();
 
     }
+
     /**
      * Creates the problem table.
+     *
      * @param parent
      */
     private void createProblemTable(Composite parent) {
-        table = new Table(parent, SWT.BORDER | SWT.H_SCROLL | SWT.V_SCROLL);
-        table.setLinesVisible(true);
-        table.setHeaderVisible(true);
+        this.table = new Table(parent, SWT.BORDER | SWT.H_SCROLL | SWT.V_SCROLL);
+        this.table.setLinesVisible(true);
+        this.table.setHeaderVisible(true);
 
-        String[] columns = {"Type", "Description", "Resource", "Path", "Line"};
+        String[] columns = {"Description", "Path", "Line", "Column"};
 
-        for (int i = 0; i < columns.length; i++) {
-            TableColumn tc = new TableColumn(table, SWT.LEFT);
-            tc.setText(columns[i]);
+        for (String column : columns) {
+            TableColumn tc = new TableColumn(this.table, SWT.LEFT);
+            tc.setText(column);
         }
 
-        for (int i = 0; i < table.getColumnCount(); i++) {
-            table.getColumn(i).pack();
+        for (int i = 0; i < this.table.getColumnCount(); i++) {
+            this.table.getColumn(i).pack();
         }
-        
-        
-        
+
     }
 
     @Override
     public void setFocus() {
-       
 
     }
 
@@ -213,14 +222,55 @@ public class ReviewView extends ViewPart {
 
         this.labelUsers.setText(groupName);
 
-        // TODO: fetch from student management system
-        this.comment = Optional.of(new Comment("not available yet"));
-        
-        //create problems
-        
+        ExerciseSubmitterManager manager = Activator.getDefault().getManager();
+        IRunnableStuMgmt<Assessment> func = new IRunnableStuMgmt<Assessment>() {
+
+            @Override
+            public Assessment run() {
+                Assessment assessment = null;
+                try {
+                    assessment = manager.getStudentManagementConnection()
+                            .getAssessment(manager.getCourse(), assignment, groupName).orElse(new Assessment());
+                } catch (ApiException e) {
+                    System.out.println(e);
+                }
+                return assessment;
+            }
+
+        };
+        StuMgmtJob<Assessment> job = new StuMgmtJob<Assessment>("name1", func, this::onFinishedStumgmtJob);
+        job.setUser(true);
+        job.schedule();
 
         this.labelProject.pack();
         this.labelUsers.pack();
+    }
+
+    /**
+     * When the job is finished.
+     *
+     * @param job
+     */
+    private void onFinishedStumgmtJob(StuMgmtJob<Assessment> job) {
+        Assessment assessment = job.getOutput();
+        this.comment = Optional.ofNullable(new Comment(assessment.getComment().orElse("Not Available"), page));
+        if (assessment.getProblemlist() != null) {
+            for (Problem problem : assessment.getProblemlist()) {
+                TableItem item = new TableItem(this.table, SWT.NONE);
+                item.setText(0, problem.getMessage());
+                item.setText(1, problem.getFile().toString());
+                item.setText(2, problem.getLine().toString());
+                item.setText(3, problem.getColumn().toString());
+
+            }
+            Display.getDefault().syncExec(() -> {
+                for (int i = 0; i < this.table.getColumnCount(); i++) {
+                    this.table.getColumn(i).pack();
+                }
+               
+            });
+        }
+
     }
 
 }

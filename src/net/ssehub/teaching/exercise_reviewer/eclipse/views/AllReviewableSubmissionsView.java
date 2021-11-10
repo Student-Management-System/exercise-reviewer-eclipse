@@ -29,6 +29,7 @@ import org.eclipse.ui.part.ViewPart;
 import org.osgi.framework.Bundle;
 
 import net.ssehub.teaching.exercise_reviewer.eclipse.Activator;
+import net.ssehub.teaching.exercise_reviewer.eclipse.background.DownloadAllSubmissionsJob;
 import net.ssehub.teaching.exercise_reviewer.eclipse.background.ListSubmissionsJob;
 import net.ssehub.teaching.exercise_reviewer.eclipse.dialog.AdvancedExceptionDialog;
 import net.ssehub.teaching.exercise_submitter.lib.data.Assignment;
@@ -94,7 +95,7 @@ public class AllReviewableSubmissionsView extends ViewPart {
              */
             @Override
             public void run() {
-                System.out.println("");
+                AllReviewableSubmissionsView.this.clickDownloadAll();
             }
         };
         this.downloadAllSubmissionAction.setImageDescriptor(this.getImageDescriptor("icons/download.png"));
@@ -134,8 +135,9 @@ public class AllReviewableSubmissionsView extends ViewPart {
                         int selected = AllReviewableSubmissionsView.this.swtList.getSelectionIndex();
                         if (!(selected < 0 || selected >= AllReviewableSubmissionsView.this.swtList.getItemCount())) {
 
-                            reviewview.refreshReviewInformation(groupNames.get().get(selected),
-                                    selectedAssignment.get());
+                            reviewview.refreshReviewInformation(
+                                    AllReviewableSubmissionsView.this.groupNames.get().get(selected),
+                                    AllReviewableSubmissionsView.this.selectedAssignment.get());
                         }
                     }
                 } catch (PartInitException e) {
@@ -229,6 +231,19 @@ public class AllReviewableSubmissionsView extends ViewPart {
     }
 
     /**
+     * Starts the download all submission job.
+     */
+    private void clickDownloadAll() {
+        if (this.selectedAssignment.isPresent()) {
+            DownloadAllSubmissionsJob job = new DownloadAllSubmissionsJob(this.getSite().getShell(),
+                    this.selectedAssignment.get(), this::onDownloadAllSubmissionsFinished,
+                    PlatformUI.getWorkbench().getActiveWorkbenchWindow());
+            job.setUser(true);
+            job.schedule();
+        }
+    }
+
+    /**
      * Creats the combo widget.
      *
      * @param parent
@@ -285,7 +300,7 @@ public class AllReviewableSubmissionsView extends ViewPart {
      * @param job
      */
     private void onListSubmissionFinished(ListSubmissionsJob job) {
-        this.groupNames = job.getGroupNames().map(set -> new ArrayList<>(set));
+        this.groupNames = job.getGroupNames().map(ArrayList::new);
         if (this.groupNames.isPresent()) {
             Display.getDefault().syncExec(() -> {
                 for (String groupName : this.groupNames.get()) {
@@ -294,6 +309,15 @@ public class AllReviewableSubmissionsView extends ViewPart {
 
             });
         }
+    }
+
+    /**
+     * When download all job is finished.
+     *
+     * @param job
+     */
+    private void onDownloadAllSubmissionsFinished(DownloadAllSubmissionsJob job) {
+
     }
 
 }
