@@ -1,5 +1,6 @@
 package net.ssehub.teaching.exercise_reviewer.eclipse.views;
 
+import java.io.File;
 import java.util.Optional;
 
 import org.eclipse.swt.SWT;
@@ -255,15 +256,16 @@ public class ReviewView extends ViewPart {
         Assessment assessment = job.getOutput();
         this.comment = Optional.ofNullable(new Comment(assessment.getComment().orElse("Not Available"), page));
         if (assessment.getProblemlist() != null) {
-            for (Problem problem : assessment.getProblemlist()) {
-                TableItem item = new TableItem(this.table, SWT.NONE);
-                item.setText(0, problem.getMessage());
-                item.setText(1, problem.getFile().toString());
-                item.setText(2, problem.getLine().toString());
-                item.setText(3, problem.getColumn().toString());
-
-            }
             Display.getDefault().syncExec(() -> {
+                for (Problem problem : assessment.getProblemlist()) {
+                    TableItem item = new TableItem(this.table, SWT.NONE);
+                    item.setText(0, problem.getMessage());
+                    item.setText(1, problem.getFile().orElse(new File("Not loading")).toString());
+                    item.setText(2, problem.getLine().get().toString());
+                    item.setText(3, problem.getColumn().get().toString());
+    
+                }
+          
                 for (int i = 0; i < this.table.getColumnCount(); i++) {
                     this.table.getColumn(i).pack();
                 }
