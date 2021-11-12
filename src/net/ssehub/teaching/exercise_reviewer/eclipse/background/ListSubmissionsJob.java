@@ -67,7 +67,7 @@ public class ListSubmissionsJob extends ReviewerJobs {
 
         } catch (ApiException e) {
             Display.getDefault().syncExec(
-                    () -> AdvancedExceptionDialog.showUnexpectedExceptionDialog(e, "Cant retrieve group list"));
+                () -> AdvancedExceptionDialog.showUnexpectedExceptionDialog(e, "Cant retrieve group list"));
         }
     }
 
