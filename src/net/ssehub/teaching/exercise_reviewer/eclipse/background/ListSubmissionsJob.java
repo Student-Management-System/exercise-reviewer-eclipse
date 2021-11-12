@@ -20,15 +20,14 @@ import net.ssehub.teaching.exercise_submitter.lib.data.Assignment;
 import net.ssehub.teaching.exercise_submitter.lib.student_management_system.ApiException;
 
 /**
- * sds.
+ * This class retrieves the list of regsitered groups for an assignment.
  *
  * @author lukas
  *
  */
-public class ListSubmissionsJob extends Job {
+public class ListSubmissionsJob extends ReviewerJobs {
 
-    private static ILock lock = Job.getJobManager().newLock();
-    private Shell shell;
+  
     private Consumer<ListSubmissionsJob> callbackCheckSubmission;
     private Optional<Set<String>> groupNames = Optional.empty();
 
@@ -43,28 +42,19 @@ public class ListSubmissionsJob extends Job {
      */
     public ListSubmissionsJob(Shell parent, Consumer<ListSubmissionsJob> callbackListSubmission,
             Assignment assignment) {
-        super("List Submission Job");
-        this.shell = parent;
+        super("List Submission Job", Optional.ofNullable(parent));
+    
         this.callbackCheckSubmission = callbackListSubmission;
         this.currentAssignment = assignment;
     }
 
     @Override
-    protected IStatus run(IProgressMonitor monitor) {
-
-        try {
-            lock.acquire();
-            // Submission submission = new Submission();
-            this.retrieveAssessmentList();
-            this.callbackCheckSubmission.accept(this);
-
-        } finally {
-
-            lock.release();
-        }
-
-        return Status.OK_STATUS;
+    protected void runAsync(IProgressMonitor monitor) {
+        this.retrieveAssessmentList();
+        this.callbackCheckSubmission.accept(this);
+        
     }
+
 
     /**
      * Retrieves the assessmentlist from the server.
@@ -78,7 +68,7 @@ public class ListSubmissionsJob extends Job {
                     .getAllGroups(manager.getCourse(), currentAssignment));
             
             Display.getDefault().asyncExec(() -> {
-                MessageDialog.openInformation(shell, getName(), "Retrieved ");
+                MessageDialog.openInformation(getShell().get(), getName(), "Retrieved ");
             });
 
         } catch (ApiException e) {
@@ -95,5 +85,7 @@ public class ListSubmissionsJob extends Job {
     public Optional<Set<String>> getGroupNames() {
         return this.groupNames;
     }
+
+  
 
 }
