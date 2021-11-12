@@ -30,7 +30,9 @@ import org.osgi.framework.Bundle;
 
 import net.ssehub.teaching.exercise_reviewer.eclipse.Activator;
 import net.ssehub.teaching.exercise_reviewer.eclipse.background.DownloadAllSubmissionsJob;
+import net.ssehub.teaching.exercise_reviewer.eclipse.background.IRunnableStuMgmt;
 import net.ssehub.teaching.exercise_reviewer.eclipse.background.ListSubmissionsJob;
+import net.ssehub.teaching.exercise_reviewer.eclipse.background.StuMgmtJob;
 import net.ssehub.teaching.exercise_reviewer.eclipse.dialog.AdvancedExceptionDialog;
 import net.ssehub.teaching.exercise_submitter.lib.data.Assignment;
 import net.ssehub.teaching.exercise_submitter.lib.student_management_system.ApiException;
@@ -276,22 +278,48 @@ public class AllReviewableSubmissionsView extends ViewPart {
      */
     private void retrieveAssignments() {
         // TODO maybe as a background job too
-        try {
-            this.assignments = Optional.ofNullable(Activator.getDefault().getManager().getAllAssignments());
 
-        } catch (ApiException e) {
-            AdvancedExceptionDialog.showUnexpectedExceptionDialog(e, "Cant retrieve assignments");
-        }
-        if (this.assignments.isPresent()) {
-            for (Assignment assignment : this.assignments.get()) {
-                this.combo.add(assignment.getName());
+        IRunnableStuMgmt<java.util.List<Assignment>> func = new IRunnableStuMgmt<java.util.List<Assignment>>() {
+
+            @Override
+            public java.util.List<Assignment> run() {
+                java.util.List<Assignment> assignments = null;
+                try {
+                    assignments = Activator.getDefault().getManager().getAllAssignments();
+                } catch (ApiException e) {
+                    Display.getDefault().syncExec(() -> {
+                        AdvancedExceptionDialog.showUnexpectedExceptionDialog(e, "Cant load assignments");
+                    });
+                }
+                return assignments;
             }
-            this.combo.pack();
-            if (this.assignments.get().size() > 0) {
-                this.selectedAssignment = Optional.ofNullable(this.assignments.get().get(0));
-                this.combo.select(0);
+
+        };
+
+        StuMgmtJob<java.util.List<Assignment>> job = new StuMgmtJob<>("Load assignments", func,
+                this::onListAssignments);
+        job.setUser(true);
+        job.schedule();
+    }
+    /**
+     * Gets called when retrive assignments job is done.
+     * @param job
+     */
+    private void onListAssignments(StuMgmtJob<java.util.List<Assignment>> job) {
+
+        this.assignments = Optional.ofNullable(job.getOutput());
+        Display.getDefault().syncExec(() -> {
+            if (this.assignments.isPresent()) {
+                for (Assignment assignment : this.assignments.get()) {
+                    combo.add(assignment.getName());
+                }
+                combo.pack();
+                if (this.assignments.get().size() > 0) {
+                    this.selectedAssignment = Optional.ofNullable(this.assignments.get().get(0));
+                    combo.select(0);
+                }
             }
-        }
+        });
     }
 
     /**
