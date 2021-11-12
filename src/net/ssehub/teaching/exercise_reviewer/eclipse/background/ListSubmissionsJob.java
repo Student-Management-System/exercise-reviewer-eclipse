@@ -5,10 +5,6 @@ import java.util.Set;
 import java.util.function.Consumer;
 
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Status;
-import org.eclipse.core.runtime.jobs.ILock;
-import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
@@ -27,7 +23,6 @@ import net.ssehub.teaching.exercise_submitter.lib.student_management_system.ApiE
  */
 public class ListSubmissionsJob extends ReviewerJobs {
 
-  
     private Consumer<ListSubmissionsJob> callbackCheckSubmission;
     private Optional<Set<String>> groupNames = Optional.empty();
 
@@ -43,7 +38,7 @@ public class ListSubmissionsJob extends ReviewerJobs {
     public ListSubmissionsJob(Shell parent, Consumer<ListSubmissionsJob> callbackListSubmission,
             Assignment assignment) {
         super("List Submission Job", Optional.ofNullable(parent));
-    
+
         this.callbackCheckSubmission = callbackListSubmission;
         this.currentAssignment = assignment;
     }
@@ -52,9 +47,8 @@ public class ListSubmissionsJob extends ReviewerJobs {
     protected void runAsync(IProgressMonitor monitor) {
         this.retrieveAssessmentList();
         this.callbackCheckSubmission.accept(this);
-        
-    }
 
+    }
 
     /**
      * Retrieves the assessmentlist from the server.
@@ -64,16 +58,16 @@ public class ListSubmissionsJob extends ReviewerJobs {
         ExerciseSubmitterManager manager = Activator.getDefault().getManager();
 
         try {
-            this.groupNames = Optional.of(manager.getStudentManagementConnection()
-                    .getAllGroups(manager.getCourse(), currentAssignment));
-            
+            this.groupNames = Optional.of(
+                    manager.getStudentManagementConnection().getAllGroups(manager.getCourse(), this.currentAssignment));
+
             Display.getDefault().asyncExec(() -> {
-                MessageDialog.openInformation(getShell().get(), getName(), "Retrieved ");
+                MessageDialog.openInformation(this.getShell().get(), this.getName(), "Retrieved ");
             });
 
         } catch (ApiException e) {
             Display.getDefault().syncExec(
-                () -> AdvancedExceptionDialog.showUnexpectedExceptionDialog(e, "Cant retrieve group list"));
+                    () -> AdvancedExceptionDialog.showUnexpectedExceptionDialog(e, "Cant retrieve group list"));
         }
     }
 
@@ -85,7 +79,5 @@ public class ListSubmissionsJob extends ReviewerJobs {
     public Optional<Set<String>> getGroupNames() {
         return this.groupNames;
     }
-
-  
 
 }
