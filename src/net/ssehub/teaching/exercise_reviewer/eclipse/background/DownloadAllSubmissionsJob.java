@@ -146,7 +146,7 @@ public class DownloadAllSubmissionsJob extends ReviewerJobs {
                 File file = null;
                 try {
                     replayer = Activator.getDefault().getManager().getReplayer(this.assignment);
-                    file = replayer.replay(replayer.getVersions().get(0), string);
+                    file = replayer.replayLatest(string);
                     submonitor.split(1).done();
                     Project project = new Project(file);
                    
