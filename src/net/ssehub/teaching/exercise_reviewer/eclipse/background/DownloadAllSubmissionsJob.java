@@ -1,5 +1,12 @@
 package net.ssehub.teaching.exercise_reviewer.eclipse.background;
 
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.UncheckedIOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -40,9 +47,70 @@ import net.ssehub.teaching.exercise_submitter.lib.student_management_system.Grou
 public class DownloadAllSubmissionsJob extends ReviewerJobs {
 
     private Assignment assignment;
-    private List<IProject> projects = new ArrayList<IProject>();
+    private List<Project> projects = new ArrayList<Project>();
     private Consumer<DownloadAllSubmissionsJob> callbackDownloadAllSubmissionsJob;
     private IWorkbenchWindow window;
+    
+    /**
+     * This class handles the project.
+     * @author lukas
+     *
+     */
+    private class Project {
+        private File file;
+        private Optional<IProject> project;
+        private Optional<Exception> exception;
+        /**
+         * Creates a new instance of Project.
+         * @param file
+         */
+        public Project(File file) {
+            this.file = file;
+        }
+        /**
+         * Sets the IProject.
+         * @param project
+         */
+        public void setIProject(IProject project) {
+            this.project = Optional.ofNullable(project);
+        }
+        /**
+         * Sets the exception.
+         * @param exception
+         */
+        public void setException(Exception exception) {
+            this.exception = Optional.ofNullable(exception);
+        }
+        /**
+         * Gets the exception as a optional.
+         * @return Optional<Exception>
+         */
+        public Optional<Exception> getException() {
+            return exception;
+        }
+        /**
+         * Returns of creation is succeded.
+         * @return boolean
+         */
+        public boolean isSucceeded() {
+            return this.exception.isEmpty();
+        }
+        /**
+         * Gets the File.
+         * @return File
+         */
+        public File getFile() {
+            return file;
+        }
+        /**
+         * Gets the IProject.
+         * @return Optional<IProject>
+         */
+        public Optional<IProject> getProject() {
+            return project;
+        }
+        
+    }
 
     /**
      * This creates an instance of {@link DownloadAllSubmissionsJob}.
@@ -64,7 +132,6 @@ public class DownloadAllSubmissionsJob extends ReviewerJobs {
     protected void runAsync(IProgressMonitor monitor) {
         monitor.beginTask("Download submissions", 100);
         IWorkingSetManager workingsetmanager = PlatformUI.getWorkbench().getWorkingSetManager();
-        IWorkbenchPage page = this.window.getActivePage();
 
         try {
             Set<String> set = Activator.getDefault().getManager().getStudentManagementConnection()
@@ -76,34 +143,71 @@ public class DownloadAllSubmissionsJob extends ReviewerJobs {
             for (String string : listNames) {
 
                 Replayer replayer = null;
+                File file = null;
                 try {
                     replayer = Activator.getDefault().getManager().getReplayer(this.assignment);
-                    replayer.replay(replayer.getVersions().get(0));
+                    file = replayer.replay(replayer.getVersions().get(0), string);
+                    submonitor.split(1).done();
+                    Project project = new Project(file);
+                   
+                    this.createIProject(project, string);
                 } catch (ReplayException | GroupNotFoundException e) {
-                    // TODO think about exception list.
+                    System.out.println(e);
                 }
-
+                
                 submonitor.split(1).done();
-
-                this.createIProject(string);
-
+                
             }
-
-            IWorkingSet[] workingsets = workingsetmanager.getWorkingSets();
-
-            IWorkingSet newSet = workingsetmanager.createWorkingSet(this.assignment.getName(),
-                    (IAdaptable[]) this.projects.toArray());
-
-            List<IWorkingSet> listworkingset = Arrays.asList(workingsets);
-            listworkingset.add(newSet);
-            workingsets = (IWorkingSet[]) listworkingset.toArray();
-
-            page.setWorkingSets(workingsets);
+            
+            createWorkingSetAndAddProjects(workingsetmanager);
+            
+            for (Project element: this.projects) {
+                try {
+                    copyProject(element.getFile().toPath(), element.project.get().getLocation().toFile().toPath());
+                    copyDefaultClasspath(element.project.get().getLocation().toFile().toPath());
+                } catch (IOException e) {
+                    element.setException(e);
+                }
+              
+            }
+           
+         
 
         } catch (ApiException e) {
             Display.getDefault().syncExec(() -> {
                 AdvancedExceptionDialog.showUnexpectedExceptionDialog(e, "Cant download all submissions");
             });
+        } catch (CoreException e) {
+            Display.getDefault().syncExec(() -> {
+                AdvancedExceptionDialog.showUnexpectedExceptionDialog(e, "Cant create projects");
+            });
+        }
+    }
+    /**
+     * Creates the workingset and adds the projects.
+     * @param workingsetmanager
+     */
+    private void createWorkingSetAndAddProjects(IWorkingSetManager workingsetmanager) {
+        IProject[] projectsArray = new IProject[this.projects.size()];
+        for (int i = 0; i < this.projects.size(); i++) {
+            projectsArray[i] = projects.get(i).getProject().get();
+        }
+       
+        IWorkingSet[] sets = workingsetmanager.getAllWorkingSets();
+        
+        boolean alreadyExisting = false;
+        
+        for (IWorkingSet element : sets) {
+            if (element.getName().equals(this.assignment.getName())) {
+                element.setElements(projectsArray);
+                alreadyExisting = true;
+                break;
+            }
+        }
+                
+        if (!alreadyExisting) {
+            IWorkingSet newSet = workingsetmanager.createWorkingSet(this.assignment.getName(), projectsArray);
+            workingsetmanager.addWorkingSet(newSet);
         }
     }
 
@@ -111,23 +215,23 @@ public class DownloadAllSubmissionsJob extends ReviewerJobs {
      * Creates the IProject.
      *
      * @param groupname
+     * @param project
      * @return boolean , true if it worked.
+     * @throws CoreException 
      */
-    private boolean createIProject(String groupname) {
+    private boolean createIProject(Project project, String groupname) throws CoreException {
         boolean isCreated = false;
 
-        String projectName = "Submission from: " + groupname;
+        String projectName = "Submission from " + groupname;
         IWorkspace workspace = ResourcesPlugin.getWorkspace();
         IWorkspaceRoot root = workspace.getRoot();
         IProject newProject = root.getProject(projectName);
-        try {
-            newProject.create(null);
-            newProject.open(null);
-            this.projects.add(newProject);
-            isCreated = true;
-        } catch (CoreException e) {
-
-        }
+        newProject.create(null);
+        newProject.open(null);
+        project.setIProject(newProject);
+        this.projects.add(project);
+        isCreated = true;
+        
 //        this.location = Optional.ofNullable(newProject.getLocation().toFile());
 //
 //        try {
@@ -140,5 +244,51 @@ public class DownloadAllSubmissionsJob extends ReviewerJobs {
 
         return isCreated;
     }
+    
+    /**
+     * Copies the default <code>.classpath</code> file from the resources to the given target directory.
+     * 
+     * @param targetDirectory The directory where to create the <code>.classpath</code> file in.
+     * 
+     * @throws IOException If creating the file fails.
+     */
+    private void copyDefaultClasspath(Path targetDirectory) throws IOException {
+        InputStream in = getClass().getResourceAsStream(".classpath");
+        if (in != null) {
+            Files.copy(in, targetDirectory.resolve(".classpath"));
+        } else {
+            throw new IOException(".classpath resource not found");
+        }
+    }
+    
+    /**
+     * Copies the project from the temp folder to the project folder.
+     *
+     * @param source
+     * @param target
+     * @throws IOException
+     */
+    private void copyProject(Path source, Path target) throws IOException {
+        try {
+            Files.walk(source).forEach(sourceFile -> {
+                Path targetFile = target.resolve(source.relativize(sourceFile));
+                
+                try {
+                    if (Files.isDirectory(sourceFile)) {
+                        if (!Files.exists(targetFile)) {
+                            Files.createDirectory(targetFile);
+                        }
+                    } else {
+                        Files.copy(sourceFile, targetFile, StandardCopyOption.REPLACE_EXISTING);
+                    }
+                } catch (IOException e) {
+                    throw new UncheckedIOException(e);
+                }
+            });
+        } catch (UncheckedIOException e) {
+            throw e.getCause();
+        }
+    }
+
 
 }
