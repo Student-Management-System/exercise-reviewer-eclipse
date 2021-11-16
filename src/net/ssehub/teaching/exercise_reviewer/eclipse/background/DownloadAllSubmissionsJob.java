@@ -15,6 +15,7 @@ import java.util.Set;
 import java.util.function.Consumer;
 
 import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IProjectDescription;
 import org.eclipse.core.resources.IWorkspace;
 import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.ResourcesPlugin;
@@ -32,6 +33,7 @@ import org.eclipse.ui.PlatformUI;
 
 import net.ssehub.teaching.exercise_reviewer.eclipse.Activator;
 import net.ssehub.teaching.exercise_reviewer.eclipse.dialog.AdvancedExceptionDialog;
+import net.ssehub.teaching.exercise_reviewer.eclipse.log.EclipseLog;
 import net.ssehub.teaching.exercise_submitter.lib.data.Assignment;
 import net.ssehub.teaching.exercise_submitter.lib.replay.ReplayException;
 import net.ssehub.teaching.exercise_submitter.lib.replay.Replayer;
@@ -232,15 +234,15 @@ public class DownloadAllSubmissionsJob extends ReviewerJobs {
         this.projects.add(project);
         isCreated = true;
         
-//        this.location = Optional.ofNullable(newProject.getLocation().toFile());
-//
-//        try {
-//            IProjectDescription description = newProject.getDescription();
-//            description.setNatureIds(new String[] {"org.eclipse.jdt.core.javanature"});
-//            newProject.setDescription(description, null);
-//        } catch (CoreException e) {
-//            EclipseLog.warning("Failed to set java nature for new project: " + e.getMessage());
-//        }
+
+
+        try {
+            IProjectDescription description = newProject.getDescription();
+            description.setNatureIds(new String[] {"org.eclipse.jdt.core.javanature"});
+            newProject.setDescription(description, null);
+        } catch (CoreException e) {
+            EclipseLog.warning("Failed to set java nature for new project: " + e.getMessage());
+        }
 
         return isCreated;
     }
