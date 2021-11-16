@@ -347,5 +347,12 @@ public class AllReviewableSubmissionsView extends ViewPart {
     private void onDownloadAllSubmissionsFinished(DownloadAllSubmissionsJob job) {
 
     }
+    /**
+     * Gets the selected Assignment from the combobox.
+     * @return Optional<Assignment>
+     */
+    public Optional<Assignment> getSelectedAssignment() {
+        return selectedAssignment;
+    }
 
 }

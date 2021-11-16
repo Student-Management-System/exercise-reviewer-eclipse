@@ -31,6 +31,7 @@ import net.ssehub.teaching.exercise_submitter.lib.ExerciseSubmitterManager;
 import net.ssehub.teaching.exercise_submitter.lib.data.Assessment;
 import net.ssehub.teaching.exercise_submitter.lib.data.Assignment;
 import net.ssehub.teaching.exercise_submitter.lib.student_management_system.ApiException;
+import net.ssehub.teaching.exercise_submitter.lib.student_management_system.GroupNotFoundException;
 import net.ssehub.teaching.exercise_submitter.lib.submission.Problem;
 
 /**
@@ -239,7 +240,8 @@ public class ReviewView extends ViewPart {
             }
 
         };
-        StuMgmtJob<Assessment> job = new StuMgmtJob<Assessment>("name1", func, this::onFinishedStumgmtJob);
+        StuMgmtJob<Assessment> job =
+                new StuMgmtJob<Assessment>("refreshInformation", func, this::onFinishedStumgmtJob);
         job.setUser(true);
         job.schedule();
 
@@ -254,23 +256,26 @@ public class ReviewView extends ViewPart {
      */
     private void onFinishedStumgmtJob(StuMgmtJob<Assessment> job) {
         Assessment assessment = job.getOutput();
-        this.comment = Optional.ofNullable(new Comment(assessment.getComment().orElse("Not Available"), page));
-        if (assessment.getProblemlist() != null) {
-            Display.getDefault().syncExec(() -> {
-                for (Problem problem : assessment.getProblemlist()) {
-                    TableItem item = new TableItem(this.table, SWT.NONE);
-                    item.setText(0, problem.getMessage());
-                    item.setText(1, problem.getFile().orElse(new File("Not loading")).toString());
-                    item.setText(2, problem.getLine().get().toString());
-                    item.setText(3, problem.getColumn().get().toString());
-    
-                }
-          
-                for (int i = 0; i < this.table.getColumnCount(); i++) {
-                    this.table.getColumn(i).pack();
-                }
-               
-            });
+        if (assessment != null) {
+            this.comment = Optional.ofNullable(
+                    new Comment(assessment.getComment().orElse("Not Available"), page));
+            if (assessment.getProblemlist() != null) {
+                Display.getDefault().syncExec(() -> {
+                    for (Problem problem : assessment.getProblemlist()) {
+                        TableItem item = new TableItem(this.table, SWT.NONE);
+                        item.setText(0, problem.getMessage());
+                        item.setText(1, problem.getFile().orElse(new File("Not loading")).toString());
+                        item.setText(2, problem.getLine().get().toString());
+                        item.setText(3, problem.getColumn().get().toString());
+        
+                    }
+              
+                    for (int i = 0; i < this.table.getColumnCount(); i++) {
+                        this.table.getColumn(i).pack();
+                    }
+                   
+                });
+            }
         }
 
     }
