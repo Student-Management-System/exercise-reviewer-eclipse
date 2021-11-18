@@ -7,7 +7,6 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.ILock;
 import org.eclipse.core.runtime.jobs.Job;
-
 import org.eclipse.swt.widgets.Shell;
 
 /**
@@ -16,7 +15,7 @@ import org.eclipse.swt.widgets.Shell;
  *
  */
 public abstract class ReviewerJobs extends Job {
-    
+
     private static ILock lock = Job.getJobManager().newLock();
     private Optional<Shell> shell;
 
@@ -34,8 +33,8 @@ public abstract class ReviewerJobs extends Job {
     protected IStatus run(IProgressMonitor monitor) {
         try {
             lock.acquire();
-            
-            runAsync(monitor);
+
+            this.runAsync(monitor);
 
         } finally {
 
@@ -44,7 +43,7 @@ public abstract class ReviewerJobs extends Job {
 
         return Status.OK_STATUS;
     }
-    
+
     /**
      * Override this class and put your work in.
      * @param monitor
@@ -55,9 +54,9 @@ public abstract class ReviewerJobs extends Job {
      * @return Optional<Shell>
      */
     public Optional<Shell> getShell() {
-        return shell;
+        return this.shell;
     }
-        
-    
+
+
 
 }
