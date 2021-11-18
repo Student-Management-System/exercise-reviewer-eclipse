@@ -8,7 +8,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -20,12 +19,10 @@ import org.eclipse.core.resources.IWorkspace;
 import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
-import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.IWorkingSet;
 import org.eclipse.ui.IWorkingSetManager;
@@ -52,7 +49,7 @@ public class DownloadAllSubmissionsJob extends ReviewerJobs {
     private List<Project> projects = new ArrayList<Project>();
     private Consumer<DownloadAllSubmissionsJob> callbackDownloadAllSubmissionsJob;
     private IWorkbenchWindow window;
-    
+
     /**
      * This class handles the project.
      * @author lukas
@@ -88,7 +85,7 @@ public class DownloadAllSubmissionsJob extends ReviewerJobs {
          * @return Optional<Exception>
          */
         public Optional<Exception> getException() {
-            return exception;
+            return this.exception;
         }
         /**
          * Returns of creation is succeded.
@@ -102,16 +99,16 @@ public class DownloadAllSubmissionsJob extends ReviewerJobs {
          * @return File
          */
         public File getFile() {
-            return file;
+            return this.file;
         }
         /**
          * Gets the IProject.
          * @return Optional<IProject>
          */
         public Optional<IProject> getProject() {
-            return project;
+            return this.project;
         }
-        
+
     }
 
     /**
@@ -151,29 +148,29 @@ public class DownloadAllSubmissionsJob extends ReviewerJobs {
                     file = replayer.replayLatest(string);
                     submonitor.split(1).done();
                     Project project = new Project(file);
-                   
+
                     this.createIProject(project, string);
                 } catch (ReplayException | GroupNotFoundException e) {
                     System.out.println(e);
                 }
-                
+
                 submonitor.split(1).done();
-                
+
             }
-            
-            createWorkingSetAndAddProjects(workingsetmanager);
-            
+
+            this.createWorkingSetAndAddProjects(workingsetmanager);
+
             for (Project element: this.projects) {
                 try {
-                    copyProject(element.getFile().toPath(), element.project.get().getLocation().toFile().toPath());
-                    copyDefaultClasspath(element.project.get().getLocation().toFile().toPath());
+                    this.copyProject(element.getFile().toPath(), element.project.get().getLocation().toFile().toPath());
+                    this.copyDefaultClasspath(element.project.get().getLocation().toFile().toPath());
                 } catch (IOException e) {
                     element.setException(e);
                 }
-              
+
             }
-           
-         
+
+
 
         } catch (ApiException e) {
             Display.getDefault().syncExec(() -> {
@@ -192,13 +189,13 @@ public class DownloadAllSubmissionsJob extends ReviewerJobs {
     private void createWorkingSetAndAddProjects(IWorkingSetManager workingsetmanager) {
         IProject[] projectsArray = new IProject[this.projects.size()];
         for (int i = 0; i < this.projects.size(); i++) {
-            projectsArray[i] = projects.get(i).getProject().get();
+            projectsArray[i] = this.projects.get(i).getProject().get();
         }
-       
+
         IWorkingSet[] sets = workingsetmanager.getAllWorkingSets();
-        
+
         boolean alreadyExisting = false;
-        
+
         for (IWorkingSet element : sets) {
             if (element.getName().equals(this.assignment.getName())) {
                 element.setElements(projectsArray);
@@ -206,7 +203,7 @@ public class DownloadAllSubmissionsJob extends ReviewerJobs {
                 break;
             }
         }
-                
+
         if (!alreadyExisting) {
             IWorkingSet newSet = workingsetmanager.createWorkingSet(this.assignment.getName(), projectsArray);
             workingsetmanager.addWorkingSet(newSet);
@@ -219,7 +216,7 @@ public class DownloadAllSubmissionsJob extends ReviewerJobs {
      * @param groupname
      * @param project
      * @return boolean , true if it worked.
-     * @throws CoreException 
+     * @throws CoreException
      */
     private boolean createIProject(Project project, String groupname) throws CoreException {
         boolean isCreated = false;
@@ -233,7 +230,6 @@ public class DownloadAllSubmissionsJob extends ReviewerJobs {
         project.setIProject(newProject);
         this.projects.add(project);
         isCreated = true;
-        
 
 
         try {
@@ -244,25 +240,27 @@ public class DownloadAllSubmissionsJob extends ReviewerJobs {
             EclipseLog.warning("Failed to set java nature for new project: " + e.getMessage());
         }
 
+        Activator.getDefault().getProjectManager().setConnection(projectName, groupname);
+
         return isCreated;
     }
-    
+
     /**
      * Copies the default <code>.classpath</code> file from the resources to the given target directory.
-     * 
+     *
      * @param targetDirectory The directory where to create the <code>.classpath</code> file in.
-     * 
+     *
      * @throws IOException If creating the file fails.
      */
     private void copyDefaultClasspath(Path targetDirectory) throws IOException {
-        InputStream in = getClass().getResourceAsStream(".classpath");
+        InputStream in = this.getClass().getResourceAsStream(".classpath");
         if (in != null) {
             Files.copy(in, targetDirectory.resolve(".classpath"));
         } else {
             throw new IOException(".classpath resource not found");
         }
     }
-    
+
     /**
      * Copies the project from the temp folder to the project folder.
      *
@@ -274,7 +272,7 @@ public class DownloadAllSubmissionsJob extends ReviewerJobs {
         try {
             Files.walk(source).forEach(sourceFile -> {
                 Path targetFile = target.resolve(source.relativize(sourceFile));
-                
+
                 try {
                     if (Files.isDirectory(sourceFile)) {
                         if (!Files.exists(targetFile)) {

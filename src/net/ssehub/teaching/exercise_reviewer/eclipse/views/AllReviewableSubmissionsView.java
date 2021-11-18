@@ -158,7 +158,7 @@ public class AllReviewableSubmissionsView extends ViewPart {
         this.createRightclickMenu();
         this.createCombo(parent);
 
-//        Submission
+        //        Submission
 
     }
 
@@ -266,6 +266,7 @@ public class AllReviewableSubmissionsView extends ViewPart {
                     AllReviewableSubmissionsView.this.selectedAssignment = Optional
                             .ofNullable(AllReviewableSubmissionsView.this.assignments.get()
                                     .get(AllReviewableSubmissionsView.this.combo.getSelectionIndex()));
+                    AllReviewableSubmissionsView.this.clickRefresh();
                 }
 
             }
@@ -311,12 +312,12 @@ public class AllReviewableSubmissionsView extends ViewPart {
         Display.getDefault().syncExec(() -> {
             if (this.assignments.isPresent()) {
                 for (Assignment assignment : this.assignments.get()) {
-                    combo.add(assignment.getName());
+                    this.combo.add(assignment.getName());
                 }
-                combo.pack();
+                this.combo.pack();
                 if (this.assignments.get().size() > 0) {
                     this.selectedAssignment = Optional.ofNullable(this.assignments.get().get(0));
-                    combo.select(0);
+                    this.combo.select(0);
                 }
             }
         });
@@ -352,7 +353,7 @@ public class AllReviewableSubmissionsView extends ViewPart {
      * @return Optional<Assignment>
      */
     public Optional<Assignment> getSelectedAssignment() {
-        return selectedAssignment;
+        return this.selectedAssignment;
     }
 
 }

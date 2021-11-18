@@ -10,6 +10,7 @@ import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 
+import net.ssehub.teaching.exercise_reviewer.eclipse.Activator;
 import net.ssehub.teaching.exercise_reviewer.eclipse.views.AllReviewableSubmissionsView;
 import net.ssehub.teaching.exercise_reviewer.eclipse.views.ReviewView;
 import net.ssehub.teaching.exercise_submitter.lib.data.Assignment;
@@ -45,12 +46,14 @@ public class ProjectSelectionListener implements ISelectionListener {
                     ReviewView reviewview = (ReviewView) PlatformUI.getWorkbench().getActiveWorkbenchWindow()
                           .getActivePage().showView("net.ssehub.teaching.exercise_reviewer.eclipse.views.reviewview");
                     
-                    reviewview.refreshReviewInformation(project.getName(), listview.getSelectedAssignment().orElse(
-                            new Assignment("Not available", "Not available", State.SUBMISSION, false)));
+                    reviewview.refreshReviewInformation(Activator.getDefault()
+                            .getProjectManager().getGroupNamer(project.getName()).orElse("not connected"),
+                            listview.getSelectedAssignment().orElse(
+                                new Assignment("Not available", "Not available", State.SUBMISSION, false)));
                 } catch (PartInitException e) {
                     // TODO Auto-generated catch block
                     e.printStackTrace();
-                }
+                } 
 
             }
         }

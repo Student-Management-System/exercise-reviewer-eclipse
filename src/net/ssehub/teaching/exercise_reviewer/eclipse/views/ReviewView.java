@@ -31,7 +31,6 @@ import net.ssehub.teaching.exercise_submitter.lib.ExerciseSubmitterManager;
 import net.ssehub.teaching.exercise_submitter.lib.data.Assessment;
 import net.ssehub.teaching.exercise_submitter.lib.data.Assignment;
 import net.ssehub.teaching.exercise_submitter.lib.student_management_system.ApiException;
-import net.ssehub.teaching.exercise_submitter.lib.student_management_system.GroupNotFoundException;
 import net.ssehub.teaching.exercise_submitter.lib.submission.Problem;
 
 /**
@@ -148,36 +147,36 @@ public class ReviewView extends ViewPart {
         gridData.horizontalSpan = 1;
         labelReview.setLayoutData(gridData);
 
-//        ButtonSelectionListener buttonListener = new ButtonSelectionListener();
-//        gatherButton = new Button(group, SWT.PUSH);
-//        gatherButton.setText("Gather from Markers");
-//        gridData = new GridData(GridData.HORIZONTAL_ALIGN_END);
-//        gridData.horizontalSpan = 1;
-//        gatherButton.setLayoutData(gridData);
-//        gatherButton.addSelectionListener(buttonListener);
-//        reviewinput = new Text(group, SWT.WRAP | SWT.BORDER | SWT.V_SCROLL);
-//        gridData = new GridData(GridData.HORIZONTAL_ALIGN_FILL);
-//        gridData.heightHint = 180;
-//        gridData.widthHint = 400;
-//        gridData.horizontalSpan = 2;
-//        reviewinput.setLayoutData(gridData);
+        //        ButtonSelectionListener buttonListener = new ButtonSelectionListener();
+        //        gatherButton = new Button(group, SWT.PUSH);
+        //        gatherButton.setText("Gather from Markers");
+        //        gridData = new GridData(GridData.HORIZONTAL_ALIGN_END);
+        //        gridData.horizontalSpan = 1;
+        //        gatherButton.setLayoutData(gridData);
+        //        gatherButton.addSelectionListener(buttonListener);
+        //        reviewinput = new Text(group, SWT.WRAP | SWT.BORDER | SWT.V_SCROLL);
+        //        gridData = new GridData(GridData.HORIZONTAL_ALIGN_FILL);
+        //        gridData.heightHint = 180;
+        //        gridData.widthHint = 400;
+        //        gridData.horizontalSpan = 2;
+        //        reviewinput.setLayoutData(gridData);
 
         this.reviewButton = new Button(group, SWT.PUSH);
         this.reviewButton.setText("Open Comment");
         this.reviewButton.setLayoutData(gridData);
         this.clickopenReview();
 
-//        labelCredits = new Label(group, 0);
-//        gridData = new GridData(GridData.HORIZONTAL_ALIGN_BEGINNING);
-//        gridData.horizontalSpan = 1;
-//        labelCredits.setLayoutData(gridData);
-//        labelCredits.setText(CREDITS_LABEL_TEXT_SIMPLE);
-//
-//        credits = new Text(group, SWT.BORDER);
-//        credits.setTextLimit(5);
-//        gridData = new GridData(GridData.HORIZONTAL_ALIGN_END);
-//        gridData.horizontalSpan = 1;
-//        credits.setLayoutData(gridData);
+        //        labelCredits = new Label(group, 0);
+        //        gridData = new GridData(GridData.HORIZONTAL_ALIGN_BEGINNING);
+        //        gridData.horizontalSpan = 1;
+        //        labelCredits.setLayoutData(gridData);
+        //        labelCredits.setText(CREDITS_LABEL_TEXT_SIMPLE);
+        //
+        //        credits = new Text(group, SWT.BORDER);
+        //        credits.setTextLimit(5);
+        //        gridData = new GridData(GridData.HORIZONTAL_ALIGN_END);
+        //        gridData.horizontalSpan = 1;
+        //        credits.setLayoutData(gridData);
     }
 
     /**
@@ -267,15 +266,20 @@ public class ReviewView extends ViewPart {
                         item.setText(1, problem.getFile().orElse(new File("Not loading")).toString());
                         item.setText(2, problem.getLine().get().toString());
                         item.setText(3, problem.getColumn().get().toString());
-        
+
                     }
-              
+
                     for (int i = 0; i < this.table.getColumnCount(); i++) {
                         this.table.getColumn(i).pack();
                     }
-                   
+
                 });
             }
+        } else {
+            Display.getDefault().syncExec(() -> {
+                this.table.clearAll();
+
+            });
         }
 
     }
