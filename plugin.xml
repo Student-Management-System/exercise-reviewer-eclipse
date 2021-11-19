@@ -63,14 +63,14 @@
         <view id="net.ssehub.teaching.exercise_reviewer.eclipse.views.reviewview"
              name="Review View"
           class="net.ssehub.teaching.exercise_reviewer.eclipse.views.ReviewView"
-          icon="icons\sample.png"/>
+          icon="icons\logo.png"/>
    </extension>
    
    <extension point="org.eclipse.ui.views">
         <view id="net.ssehub.teaching.exercise_reviewer.eclipse.views.allreviewablesubmissionsview"
              name="All reviewable submission View"
           class="net.ssehub.teaching.exercise_reviewer.eclipse.views.AllReviewableSubmissionsView"
-          icon="icons\sample.png"/>
+          icon="icons\logo.png"/>
    </extension>
    
    <extension point="org.eclipse.ui.perspectiveExtensions"> 
@@ -93,5 +93,6 @@
         </perspectiveExtension> 
     </extension> 
    
+ 
 
 </plugin>

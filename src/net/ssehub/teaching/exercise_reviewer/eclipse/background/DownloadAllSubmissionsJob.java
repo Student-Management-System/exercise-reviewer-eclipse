@@ -15,11 +15,13 @@ import java.util.function.Consumer;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IProjectDescription;
+import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IWorkspace;
 import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
@@ -239,6 +241,7 @@ public class DownloadAllSubmissionsJob extends ReviewerJobs {
         } catch (CoreException e) {
             EclipseLog.warning("Failed to set java nature for new project: " + e.getMessage());
         }
+        newProject.refreshLocal(IResource.DEPTH_INFINITE, new NullProgressMonitor());
 
         Activator.getDefault().getProjectManager().setConnection(projectName, groupname);
 

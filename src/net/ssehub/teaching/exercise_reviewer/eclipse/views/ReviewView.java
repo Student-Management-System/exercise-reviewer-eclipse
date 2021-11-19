@@ -1,8 +1,13 @@
 package net.ssehub.teaching.exercise_reviewer.eclipse.views;
 
 import java.io.File;
+import java.net.URL;
 import java.util.Optional;
 
+import org.eclipse.core.runtime.Platform;
+import org.eclipse.jface.action.Action;
+import org.eclipse.jface.action.IToolBarManager;
+import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
@@ -21,6 +26,7 @@ import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.part.ViewPart;
+import org.osgi.framework.Bundle;
 
 import net.ssehub.teaching.exercise_reviewer.eclipse.Activator;
 import net.ssehub.teaching.exercise_reviewer.eclipse.background.IRunnableStuMgmt;
@@ -48,6 +54,8 @@ public class ReviewView extends ViewPart {
     private Label labelProject;
 
     private Button reviewButton;
+    
+    private Action uploadAction;
 
     private Table table;
 
@@ -165,6 +173,12 @@ public class ReviewView extends ViewPart {
         this.reviewButton.setText("Open Comment");
         this.reviewButton.setLayoutData(gridData);
         this.clickopenReview();
+      
+        
+       
+        clickUpload();
+        
+        createToolbar();
 
         //        labelCredits = new Label(group, 0);
         //        gridData = new GridData(GridData.HORIZONTAL_ALIGN_BEGINNING);
@@ -177,6 +191,12 @@ public class ReviewView extends ViewPart {
         //        gridData = new GridData(GridData.HORIZONTAL_ALIGN_END);
         //        gridData.horizontalSpan = 1;
         //        credits.setLayoutData(gridData);
+    }
+
+    private void createToolbar() {
+        IToolBarManager mgr = this.getViewSite().getActionBars().getToolBarManager();
+        mgr.add(this.uploadAction);
+        
     }
 
     /**
@@ -212,6 +232,32 @@ public class ReviewView extends ViewPart {
         });
     }
 
+    private void clickUpload() {
+        this.uploadAction = new Action("Upload assessment") {
+            /**
+             * Creates the button press action.
+             */
+            @Override
+            public void run() {
+              
+            }
+        };
+        this.uploadAction.setImageDescriptor(this.getImageDescriptor("icons/upload.png"));
+    }
+    
+    /**
+     * Gets the imagedescriptor from the relative icon path.
+     *
+     * @param relativePath
+     * @return ImageDescriptor
+     */
+    private ImageDescriptor getImageDescriptor(String relativePath) {
+        Activator.getDefault();
+        Bundle bundle = Platform.getBundle(Activator.PLUGIN_ID);
+        URL fullPathString = bundle.getEntry(relativePath);
+        return ImageDescriptor.createFromURL(fullPathString);
+    }
+
     /**
      * Refreshes the review data with the current submission.
      *
@@ -219,6 +265,8 @@ public class ReviewView extends ViewPart {
      * @param assignment
      */
     public void refreshReviewInformation(String groupName, Assignment assignment) {
+        
+        
         this.labelProject.setText(assignment.getName());
 
         this.labelUsers.setText(groupName);
@@ -275,13 +323,13 @@ public class ReviewView extends ViewPart {
 
                 });
             }
-        } else {
+        } else { 
+
             Display.getDefault().syncExec(() -> {
                 this.table.clearAll();
-
+                
             });
         }
-
     }
 
 }
