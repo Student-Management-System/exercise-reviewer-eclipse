@@ -23,6 +23,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.SubMonitor;
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IWorkbenchWindow;
@@ -32,6 +33,7 @@ import org.eclipse.ui.PlatformUI;
 
 import net.ssehub.teaching.exercise_reviewer.eclipse.Activator;
 import net.ssehub.teaching.exercise_reviewer.eclipse.dialog.AdvancedExceptionDialog;
+import net.ssehub.teaching.exercise_reviewer.eclipse.dialog.DownloadAllResultDialog;
 import net.ssehub.teaching.exercise_reviewer.eclipse.log.EclipseLog;
 import net.ssehub.teaching.exercise_submitter.lib.data.Assignment;
 import net.ssehub.teaching.exercise_submitter.lib.replay.ReplayException;
@@ -57,16 +59,22 @@ public class DownloadAllSubmissionsJob extends ReviewerJobs {
      * @author lukas
      *
      */
-    private class Project {
-        private File file;
-        private Optional<IProject> project;
-        private Optional<Exception> exception;
+    public class Project {
+        private Optional<File> file = Optional.empty();
+        private Optional<IProject> project = Optional.empty();
+        private Optional<Exception> exception = Optional.empty();
         /**
          * Creates a new instance of Project.
+         */
+        public Project() {
+           
+        }
+        /**
+         * Sets the file.
          * @param file
          */
-        public Project(File file) {
-            this.file = file;
+        public void setFile(File file) {
+            this.file = Optional.ofNullable(file);
         }
         /**
          * Sets the IProject.
@@ -100,7 +108,7 @@ public class DownloadAllSubmissionsJob extends ReviewerJobs {
          * Gets the File.
          * @return File
          */
-        public File getFile() {
+        public Optional<File> getFile() {
             return this.file;
         }
         /**
@@ -142,37 +150,32 @@ public class DownloadAllSubmissionsJob extends ReviewerJobs {
             SubMonitor submonitor = SubMonitor.convert(monitor, listNames.size());
 
             for (String string : listNames) {
-
+                Project project = new Project();
                 Replayer replayer = null;
                 File file = null;
                 try {
                     replayer = Activator.getDefault().getManager().getReplayer(this.assignment);
                     file = replayer.replayLatest(string);
                     submonitor.split(1).done();
-                    Project project = new Project(file);
-
+                    project.setFile(file);
                     this.createIProject(project, string);
                 } catch (ReplayException | GroupNotFoundException e) {
-                    System.out.println(e);
+                    project.setException(e);
                 }
-
+                this.projects.add(project);
                 submonitor.split(1).done();
 
             }
 
             this.createWorkingSetAndAddProjects(workingsetmanager);
 
-            for (Project element: this.projects) {
-                try {
-                    this.copyProject(element.getFile().toPath(), element.project.get().getLocation().toFile().toPath());
-                    this.copyDefaultClasspath(element.project.get().getLocation().toFile().toPath());
-                } catch (IOException e) {
-                    element.setException(e);
-                }
-
-            }
-
-
+            copyDownloadedProjects();
+            
+            Display.getDefault().syncExec(() -> {
+                DownloadAllResultDialog dialog = new DownloadAllResultDialog(getShell().orElse(new Shell()), projects);
+                dialog.open();
+            });
+           
 
         } catch (ApiException e) {
             Display.getDefault().syncExec(() -> {
@@ -185,13 +188,31 @@ public class DownloadAllSubmissionsJob extends ReviewerJobs {
         }
     }
     /**
+     * Copys the downloaded files to the projectfolders.
+     */
+    private void copyDownloadedProjects() {
+        for (Project element: this.projects) {
+            if (element.isSucceeded()) {
+                try {
+                    this.copyProject(element.getFile().get().toPath(), 
+                            element.project.get().getLocation().toFile().toPath());
+                    this.copyDefaultClasspath(element.project.get().getLocation().toFile().toPath());
+                } catch (IOException e) {
+                    //element.setException(e);
+                }
+            }
+        }
+    }
+    /**
      * Creates the workingset and adds the projects.
      * @param workingsetmanager
      */
     private void createWorkingSetAndAddProjects(IWorkingSetManager workingsetmanager) {
         IProject[] projectsArray = new IProject[this.projects.size()];
         for (int i = 0; i < this.projects.size(); i++) {
-            projectsArray[i] = this.projects.get(i).getProject().get();
+            if (this.projects.get(i).isSucceeded()) {
+                projectsArray[i] = this.projects.get(i).getProject().get();
+            }
         }
 
         IWorkingSet[] sets = workingsetmanager.getAllWorkingSets();
@@ -230,7 +251,6 @@ public class DownloadAllSubmissionsJob extends ReviewerJobs {
         newProject.create(null);
         newProject.open(null);
         project.setIProject(newProject);
-        this.projects.add(project);
         isCreated = true;
 
 
