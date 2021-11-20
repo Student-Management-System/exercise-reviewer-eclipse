@@ -9,6 +9,7 @@ import java.util.Optional;
 import org.eclipse.core.filesystem.EFS;
 import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.core.runtime.NullProgressMonitor;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.PartInitException;
@@ -85,15 +86,21 @@ public class Comment {
      * @return String
      */
     public String getComment() {
-        if (this.editor.isPresent()) {
-            this.editor.get().doSave(new NullProgressMonitor());
-        }
+        Display.getDefault().syncExec(() -> {
+            if (this.editor.isPresent()) {
+                this.editor.get().doSave(new NullProgressMonitor());
+            }
+        });
         String stringcomment = null;
         try {
             stringcomment = Files.readString(this.file.toPath());
         } catch (IOException e) {
-            AdvancedExceptionDialog.showUnexpectedExceptionDialog(e, "Cant load comment");
+            Display.getDefault().syncExec(() -> {
+                AdvancedExceptionDialog.showUnexpectedExceptionDialog(e, "Cant load comment");
+                
+            });
         }
+        
 
         return stringcomment;
 
