@@ -7,6 +7,7 @@ import java.util.Optional;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IToolBarManager;
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionEvent;
@@ -18,6 +19,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
@@ -36,6 +38,7 @@ import net.ssehub.teaching.exercise_reviewer.eclipse.listener.ProjectSelectionLi
 import net.ssehub.teaching.exercise_submitter.lib.ExerciseSubmitterManager;
 import net.ssehub.teaching.exercise_submitter.lib.data.Assessment;
 import net.ssehub.teaching.exercise_submitter.lib.data.Assignment;
+import net.ssehub.teaching.exercise_submitter.lib.data.Assignment.State;
 import net.ssehub.teaching.exercise_submitter.lib.student_management_system.ApiException;
 import net.ssehub.teaching.exercise_submitter.lib.submission.Problem;
 
@@ -54,12 +57,15 @@ public class ReviewView extends ViewPart {
     private Label labelProject;
 
     private Button reviewButton;
-    
+
     private Action uploadAction;
 
     private Table table;
 
     private Optional<Comment> comment = Optional.empty();
+    private Optional<Assignment> assignment = Optional.empty();
+    private Optional<String> groupname = Optional.empty();
+    private Optional<Assessment> assessment = Optional.empty();
 
     private ISelectionListener listener = new ProjectSelectionListener();
 
@@ -90,7 +96,7 @@ public class ReviewView extends ViewPart {
         this.table.setLinesVisible(true);
         this.table.setHeaderVisible(true);
 
-        String[] columns = {"Description", "Path", "Line", "Column"};
+        String[] columns = {"Description", "Path", "Line", "Column" };
 
         for (String column : columns) {
             TableColumn tc = new TableColumn(this.table, SWT.LEFT);
@@ -155,48 +161,59 @@ public class ReviewView extends ViewPart {
         gridData.horizontalSpan = 1;
         labelReview.setLayoutData(gridData);
 
-        //        ButtonSelectionListener buttonListener = new ButtonSelectionListener();
-        //        gatherButton = new Button(group, SWT.PUSH);
-        //        gatherButton.setText("Gather from Markers");
-        //        gridData = new GridData(GridData.HORIZONTAL_ALIGN_END);
-        //        gridData.horizontalSpan = 1;
-        //        gatherButton.setLayoutData(gridData);
-        //        gatherButton.addSelectionListener(buttonListener);
-        //        reviewinput = new Text(group, SWT.WRAP | SWT.BORDER | SWT.V_SCROLL);
-        //        gridData = new GridData(GridData.HORIZONTAL_ALIGN_FILL);
-        //        gridData.heightHint = 180;
-        //        gridData.widthHint = 400;
-        //        gridData.horizontalSpan = 2;
-        //        reviewinput.setLayoutData(gridData);
+        // ButtonSelectionListener buttonListener = new ButtonSelectionListener();
+        // gatherButton = new Button(group, SWT.PUSH);
+        // gatherButton.setText("Gather from Markers");
+        // gridData = new GridData(GridData.HORIZONTAL_ALIGN_END);
+        // gridData.horizontalSpan = 1;
+        // gatherButton.setLayoutData(gridData);
+        // gatherButton.addSelectionListener(buttonListener);
+        // reviewinput = new Text(group, SWT.WRAP | SWT.BORDER | SWT.V_SCROLL);
+        // gridData = new GridData(GridData.HORIZONTAL_ALIGN_FILL);
+        // gridData.heightHint = 180;
+        // gridData.widthHint = 400;
+        // gridData.horizontalSpan = 2;
+        // reviewinput.setLayoutData(gridData);
 
         this.reviewButton = new Button(group, SWT.PUSH);
         this.reviewButton.setText("Open Comment");
         this.reviewButton.setLayoutData(gridData);
         this.clickopenReview();
-      
-        
-       
-        clickUpload();
-        
+
+
         createToolbar();
 
-        //        labelCredits = new Label(group, 0);
-        //        gridData = new GridData(GridData.HORIZONTAL_ALIGN_BEGINNING);
-        //        gridData.horizontalSpan = 1;
-        //        labelCredits.setLayoutData(gridData);
-        //        labelCredits.setText(CREDITS_LABEL_TEXT_SIMPLE);
+        // labelCredits = new Label(group, 0);
+        // gridData = new GridData(GridData.HORIZONTAL_ALIGN_BEGINNING);
+        // gridData.horizontalSpan = 1;
+        // labelCredits.setLayoutData(gridData);
+        // labelCredits.setText(CREDITS_LABEL_TEXT_SIMPLE);
         //
-        //        credits = new Text(group, SWT.BORDER);
-        //        credits.setTextLimit(5);
-        //        gridData = new GridData(GridData.HORIZONTAL_ALIGN_END);
-        //        gridData.horizontalSpan = 1;
-        //        credits.setLayoutData(gridData);
+        // credits = new Text(group, SWT.BORDER);
+        // credits.setTextLimit(5);
+        // gridData = new GridData(GridData.HORIZONTAL_ALIGN_END);
+        // gridData.horizontalSpan = 1;
+        // credits.setLayoutData(gridData);
     }
-
+    /**
+     * Creates the Toolbar for the View.
+     */
     private void createToolbar() {
+
+        this.uploadAction = new Action("Upload assessment") {
+            /**
+             * Creates the button press action.
+             */
+            @Override
+            public void run() {
+                clickUpload();
+            }
+        };
+        this.uploadAction.setImageDescriptor(this.getImageDescriptor("icons/upload.png"));
+        
         IToolBarManager mgr = this.getViewSite().getActionBars().getToolBarManager();
         mgr.add(this.uploadAction);
-        
+
     }
 
     /**
@@ -231,20 +248,41 @@ public class ReviewView extends ViewPart {
             }
         });
     }
-
+    /**
+     * Called when the upload button is pressed.
+     */
     private void clickUpload() {
-        this.uploadAction = new Action("Upload assessment") {
-            /**
-             * Creates the button press action.
-             */
+        
+        ExerciseSubmitterManager manager = Activator.getDefault().getManager();
+        IRunnableStuMgmt<Boolean> func = new IRunnableStuMgmt<Boolean>() {
+           
+
             @Override
-            public void run() {
-              
+            public Boolean run() {
+                boolean success = true;
+                if (assignment.isPresent() && groupname.isPresent() && assessment.isPresent()) {
+                    try {
+                        Assessment uploadAssessment = new Assessment();
+                        uploadAssessment.setManagementId(assessment.get().getManagementId().orElse(""));
+                        uploadAssessment.setComment(comment.orElse(new Comment("Not Available", page)).getComment());
+                        manager.getStudentManagementConnection().uploadAssessment(manager.getCourse(), assignment.get(),
+                                groupname.get(), uploadAssessment);
+                    } catch (ApiException e) {
+                        success = false;
+                    }
+                } else {
+                    success = false;
+                }
+                return success;
             }
+
         };
-        this.uploadAction.setImageDescriptor(this.getImageDescriptor("icons/upload.png"));
+        StuMgmtJob<Boolean> job = new StuMgmtJob<Boolean>("upload assessment", func, this::onFinishedUploadAssessment);
+        job.setUser(true);
+        job.schedule();
+      
     }
-    
+
     /**
      * Gets the imagedescriptor from the relative icon path.
      *
@@ -265,8 +303,10 @@ public class ReviewView extends ViewPart {
      * @param assignment
      */
     public void refreshReviewInformation(String groupName, Assignment assignment) {
-        
-        
+
+        this.assignment = Optional.ofNullable(assignment);
+        this.groupname = Optional.ofNullable(groupName);
+
         this.labelProject.setText(assignment.getName());
 
         this.labelUsers.setText(groupName);
@@ -287,8 +327,7 @@ public class ReviewView extends ViewPart {
             }
 
         };
-        StuMgmtJob<Assessment> job =
-                new StuMgmtJob<Assessment>("refreshInformation", func, this::onFinishedStumgmtJob);
+        StuMgmtJob<Assessment> job = new StuMgmtJob<Assessment>("refreshInformation", func, this::onFinishedStumgmtJob);
         job.setUser(true);
         job.schedule();
 
@@ -304,8 +343,8 @@ public class ReviewView extends ViewPart {
     private void onFinishedStumgmtJob(StuMgmtJob<Assessment> job) {
         Assessment assessment = job.getOutput();
         if (assessment != null) {
-            this.comment = Optional.ofNullable(
-                    new Comment(assessment.getComment().orElse("Not Available"), page));
+            this.comment = Optional.ofNullable(new Comment(assessment.getComment().orElse("Not Available"), page));
+            this.assessment = Optional.ofNullable(assessment);
             if (assessment.getProblemlist() != null) {
                 Display.getDefault().syncExec(() -> {
                     for (Problem problem : assessment.getProblemlist()) {
@@ -323,11 +362,28 @@ public class ReviewView extends ViewPart {
 
                 });
             }
-        } else { 
+        } else {
 
             Display.getDefault().syncExec(() -> {
                 this.table.clearAll();
-                
+
+            });
+        }
+    }
+    /**
+     * Called when the upload job is finished.
+     * @param job
+     */
+    private void onFinishedUploadAssessment(StuMgmtJob<Boolean> job) {
+        if (job.getOutput() != null && job.getOutput())  {
+            Display.getDefault().syncExec(() -> {
+                MessageDialog.openInformation(job.getShell().orElse(new Shell()), "Upload Assessment", 
+                        "Assessment successfully uploadet");
+            });
+        } else {
+            Display.getDefault().syncExec(() -> {
+                MessageDialog.openError(job.getShell().orElse(new Shell()), "Upload Assessment", 
+                        "Assessment uploading failed");
             });
         }
     }
