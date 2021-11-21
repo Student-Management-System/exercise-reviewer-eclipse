@@ -23,7 +23,6 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.SubMonitor;
-import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IWorkbenchWindow;
@@ -60,14 +59,16 @@ public class DownloadAllSubmissionsJob extends ReviewerJobs {
      *
      */
     public class Project {
+        private String groupName;
         private Optional<File> file = Optional.empty();
         private Optional<IProject> project = Optional.empty();
         private Optional<Exception> exception = Optional.empty();
         /**
          * Creates a new instance of Project.
+         * @param groupname
          */
-        public Project() {
-           
+        public Project(String groupname) {
+            this.groupName = groupname;
         }
         /**
          * Sets the file.
@@ -118,6 +119,13 @@ public class DownloadAllSubmissionsJob extends ReviewerJobs {
         public Optional<IProject> getProject() {
             return this.project;
         }
+        /**
+         * Gets the groupname.
+         * @return String
+         */
+        public String getGroupName() {
+            return this.groupName;
+        }
 
     }
 
@@ -150,7 +158,7 @@ public class DownloadAllSubmissionsJob extends ReviewerJobs {
             SubMonitor submonitor = SubMonitor.convert(monitor, listNames.size());
 
             for (String string : listNames) {
-                Project project = new Project();
+                Project project = new Project(string);
                 Replayer replayer = null;
                 File file = null;
                 try {
@@ -159,7 +167,7 @@ public class DownloadAllSubmissionsJob extends ReviewerJobs {
                     submonitor.split(1).done();
                     project.setFile(file);
                     this.createIProject(project, string);
-                } catch (ReplayException | GroupNotFoundException e) {
+                } catch (ReplayException | GroupNotFoundException | CoreException e) {
                     project.setException(e);
                 }
                 this.projects.add(project);
@@ -180,10 +188,6 @@ public class DownloadAllSubmissionsJob extends ReviewerJobs {
         } catch (ApiException e) {
             Display.getDefault().syncExec(() -> {
                 AdvancedExceptionDialog.showUnexpectedExceptionDialog(e, "Cant download all submissions");
-            });
-        } catch (CoreException e) {
-            Display.getDefault().syncExec(() -> {
-                AdvancedExceptionDialog.showUnexpectedExceptionDialog(e, "Cant create projects");
             });
         }
     }
