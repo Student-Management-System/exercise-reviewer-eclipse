@@ -2,13 +2,23 @@ package net.ssehub.teaching.exercise_reviewer.eclipse.views;
 
 import java.io.File;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
+import org.eclipse.core.filesystem.EFS;
+import org.eclipse.core.filesystem.IFileStore;
+import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.ResourcesPlugin;
+import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.resource.ImageDescriptor;
+import org.eclipse.jface.text.BadLocationException;
+import org.eclipse.jface.text.IDocument;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
@@ -23,11 +33,16 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
+import org.eclipse.ui.IEditorInput;
+import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.ISelectionListener;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.ide.FileStoreEditorInput;
+import org.eclipse.ui.ide.IDE;
 import org.eclipse.ui.part.ViewPart;
+import org.eclipse.ui.texteditor.ITextEditor;
 import org.osgi.framework.Bundle;
 
 import net.ssehub.teaching.exercise_reviewer.eclipse.Activator;
@@ -66,6 +81,7 @@ public class ReviewView extends ViewPart {
     private Optional<Assignment> assignment = Optional.empty();
     private Optional<String> groupname = Optional.empty();
     private Optional<Assessment> assessment = Optional.empty();
+    private List<Problem> problems = new ArrayList<Problem>();
 
     private ISelectionListener listener = new ProjectSelectionListener();
 
@@ -92,7 +108,7 @@ public class ReviewView extends ViewPart {
      * @param parent
      */
     private void createProblemTable(Composite parent) {
-        this.table = new Table(parent, SWT.BORDER | SWT.H_SCROLL | SWT.V_SCROLL);
+        this.table = new Table(parent, SWT.BORDER | SWT.FULL_SELECTION | SWT.H_SCROLL | SWT.V_SCROLL);
         this.table.setLinesVisible(true);
         this.table.setHeaderVisible(true);
 
@@ -106,6 +122,23 @@ public class ReviewView extends ViewPart {
         for (int i = 0; i < this.table.getColumnCount(); i++) {
             this.table.getColumn(i).pack();
         }
+        
+        this.table.addSelectionListener(new SelectionListener() {
+            
+            @Override
+            public void widgetSelected(SelectionEvent arg0) {
+                if (!problems.isEmpty()) {
+                    clickProblem(problems.get(table.getSelectionIndex()));
+                }
+                
+            }
+            
+            @Override
+            public void widgetDefaultSelected(SelectionEvent arg0) {
+                // TODO Auto-generated method stub
+                
+            }
+        });
 
     }
 
@@ -282,6 +315,36 @@ public class ReviewView extends ViewPart {
         job.schedule();
       
     }
+    /**
+     * Called when a problem from the list is clicked.
+     * @param problem
+     */
+    private void clickProblem(Problem problem) {
+        final IFile inputFile = ResourcesPlugin.getWorkspace().getRoot().getFile(
+                Path.fromOSString("/Submission from " + groupname.get() + "/" 
+                        + problem.getFile().orElse(new File("not available")).toString()));
+   
+        if (inputFile != null) {
+            IWorkbenchPage page = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
+            try {
+                IFileStore store = EFS.getStore(inputFile.getLocationURI());
+                IEditorInput input = new FileStoreEditorInput(store);
+                IEditorPart openEditor = IDE.openEditor(page, input, "org.eclipse.jdt.ui.CompilationUnitEditor", true);
+
+                if (openEditor instanceof ITextEditor) {
+                    ITextEditor textEditor = (ITextEditor) openEditor;
+                    IDocument document = textEditor.getDocumentProvider().getDocument(textEditor.getEditorInput());
+                    textEditor.selectAndReveal(document.getLineOffset(problem.getLine().orElse(1) - 1), 
+                            document.getLineLength(problem.getLine().orElse(1) - 1));
+                }
+                
+            } catch (CoreException | BadLocationException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+        }
+
+    }
 
     /**
      * Gets the imagedescriptor from the relative icon path.
@@ -346,8 +409,9 @@ public class ReviewView extends ViewPart {
             this.comment = Optional.ofNullable(new Comment(assessment.getComment().orElse("Not Available"), page));
             this.assessment = Optional.ofNullable(assessment);
             if (assessment.getProblemlist() != null) {
+                problems = assessment.getProblemlist();
                 Display.getDefault().syncExec(() -> {
-                    for (Problem problem : assessment.getProblemlist()) {
+                    for (Problem problem : problems) {
                         TableItem item = new TableItem(this.table, SWT.NONE);
                         item.setText(0, problem.getMessage());
                         item.setText(1, problem.getFile().orElse(new File("Not loading")).toString());
