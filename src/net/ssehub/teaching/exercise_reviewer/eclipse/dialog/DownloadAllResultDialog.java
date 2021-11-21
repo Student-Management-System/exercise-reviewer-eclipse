@@ -5,9 +5,12 @@ import java.util.List;
 
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
@@ -24,6 +27,8 @@ import net.ssehub.teaching.exercise_reviewer.eclipse.background.DownloadAllSubmi
 public class DownloadAllResultDialog extends Dialog {
     private List<Project> successProjects;
     private List<Project> failedProjects;
+    
+    private Button openExceptionDialog;
     /**
      * Creates a new instance of {@link DownloadAllResultDialog}.
      * @param parentShell
@@ -54,6 +59,25 @@ public class DownloadAllResultDialog extends Dialog {
         resultSuccededFailed.setLayoutData(new GridData(GridData.HORIZONTAL_ALIGN_FILL));
         String resultSuccededFailedString = Integer.toString(this.failedProjects.size());
         resultSuccededFailed.setText(resultSuccededFailedString);
+        
+        new Label(container, SWT.NULL).setText("Reasons for failing:");
+        this.openExceptionDialog = new Button(container, SWT.PUSH);
+        this.openExceptionDialog.setText("Open");
+        this.openExceptionDialog.addSelectionListener(new SelectionListener() {
+            
+            @Override
+            public void widgetSelected(SelectionEvent arg0) {
+                ExceptionTableDialog tableDialog = new ExceptionTableDialog(getParentShell(), failedProjects);
+                tableDialog.open();
+                
+            }
+            
+            @Override
+            public void widgetDefaultSelected(SelectionEvent arg0) {
+                // TODO Auto-generated method stub
+                
+            }
+        });
            
                
         return container;
@@ -85,7 +109,7 @@ public class DownloadAllResultDialog extends Dialog {
 
     @Override
     protected Point getInitialSize() {
-        return new Point(325, 225);
+        return new Point(220, 170);
     }
 
 }
