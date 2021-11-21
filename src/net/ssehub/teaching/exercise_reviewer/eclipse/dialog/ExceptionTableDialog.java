@@ -17,6 +17,7 @@ import net.ssehub.teaching.exercise_reviewer.eclipse.background.DownloadAllSubmi
 
 /**
  * This Dialog display all exceptions thrown from downloading the submissions.
+ * 
  * @author lukas
  *
  */

@@ -29,10 +29,12 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.MessageBox;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
+import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.ISelectionListener;
@@ -53,7 +55,6 @@ import net.ssehub.teaching.exercise_reviewer.eclipse.listener.ProjectSelectionLi
 import net.ssehub.teaching.exercise_submitter.lib.ExerciseSubmitterManager;
 import net.ssehub.teaching.exercise_submitter.lib.data.Assessment;
 import net.ssehub.teaching.exercise_submitter.lib.data.Assignment;
-import net.ssehub.teaching.exercise_submitter.lib.data.Assignment.State;
 import net.ssehub.teaching.exercise_submitter.lib.student_management_system.ApiException;
 import net.ssehub.teaching.exercise_submitter.lib.submission.Problem;
 
@@ -76,6 +77,8 @@ public class ReviewView extends ViewPart {
     private Action uploadAction;
 
     private Table table;
+    
+    private Text textPoints;
 
     private Optional<Comment> comment = Optional.empty();
     private Optional<Assignment> assignment = Optional.empty();
@@ -194,39 +197,26 @@ public class ReviewView extends ViewPart {
         gridData.horizontalSpan = 1;
         labelReview.setLayoutData(gridData);
 
-        // ButtonSelectionListener buttonListener = new ButtonSelectionListener();
-        // gatherButton = new Button(group, SWT.PUSH);
-        // gatherButton.setText("Gather from Markers");
-        // gridData = new GridData(GridData.HORIZONTAL_ALIGN_END);
-        // gridData.horizontalSpan = 1;
-        // gatherButton.setLayoutData(gridData);
-        // gatherButton.addSelectionListener(buttonListener);
-        // reviewinput = new Text(group, SWT.WRAP | SWT.BORDER | SWT.V_SCROLL);
-        // gridData = new GridData(GridData.HORIZONTAL_ALIGN_FILL);
-        // gridData.heightHint = 180;
-        // gridData.widthHint = 400;
-        // gridData.horizontalSpan = 2;
-        // reviewinput.setLayoutData(gridData);
-
         this.reviewButton = new Button(group, SWT.PUSH);
         this.reviewButton.setText("Open Comment");
         this.reviewButton.setLayoutData(gridData);
         this.clickopenReview();
+        
+        Label labelPoints = new Label(group, 0);
+        labelPoints.setText("Points:");
+        gridData = new GridData(GridData.HORIZONTAL_ALIGN_BEGINNING);
+        gridData.horizontalSpan = 1;
+        labelPoints.setLayoutData(gridData);
+        
+        this.textPoints = new Text(group, SWT.BORDER);
+        this.textPoints.setTextLimit(5);
+        gridData = new GridData(GridData.HORIZONTAL_ALIGN_END);
+        gridData.horizontalSpan = 1;
+        this.textPoints.setLayoutData(gridData);
 
 
         createToolbar();
 
-        // labelCredits = new Label(group, 0);
-        // gridData = new GridData(GridData.HORIZONTAL_ALIGN_BEGINNING);
-        // gridData.horizontalSpan = 1;
-        // labelCredits.setLayoutData(gridData);
-        // labelCredits.setText(CREDITS_LABEL_TEXT_SIMPLE);
-        //
-        // credits = new Text(group, SWT.BORDER);
-        // credits.setTextLimit(5);
-        // gridData = new GridData(GridData.HORIZONTAL_ALIGN_END);
-        // gridData.horizontalSpan = 1;
-        // credits.setLayoutData(gridData);
     }
     /**
      * Creates the Toolbar for the View.
@@ -298,10 +288,18 @@ public class ReviewView extends ViewPart {
                         Assessment uploadAssessment = new Assessment();
                         uploadAssessment.setManagementId(assessment.get().getManagementId().orElse(""));
                         uploadAssessment.setComment(comment.orElse(new Comment("Not Available", page)).getComment());
+                        Display.getDefault().syncExec(() -> uploadAssessment.setPoints(
+                                Double.parseDouble(textPoints.getText())));
                         manager.getStudentManagementConnection().uploadAssessment(manager.getCourse(), assignment.get(),
                                 groupname.get(), uploadAssessment);
                     } catch (ApiException e) {
                         success = false;
+                    } catch (NumberFormatException e) {
+                        success = false;
+                        Display.getDefault().syncExec(() -> {
+                            MessageDialog.openError(getSite().getShell(), "Upload Assessment", 
+                                    "Cant upload because no Points selected");
+                        });
                     }
                 } else {
                     success = false;
@@ -408,6 +406,10 @@ public class ReviewView extends ViewPart {
         if (assessment != null) {
             this.comment = Optional.ofNullable(new Comment(assessment.getComment().orElse("Not Available"), page));
             this.assessment = Optional.ofNullable(assessment);
+            if (assessment.getPoints().isPresent()) {
+                Display.getDefault().syncExec(() -> this.textPoints.setText(
+                        Double.toString(assessment.getPoints().get())));
+            }
             if (assessment.getProblemlist() != null) {
                 problems = assessment.getProblemlist();
                 Display.getDefault().syncExec(() -> {

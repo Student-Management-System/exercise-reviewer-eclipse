@@ -21,6 +21,7 @@ import net.ssehub.teaching.exercise_reviewer.eclipse.background.DownloadAllSubmi
 /**
  * This class displays the Downloadall Result. The number of 
  * successes and failures and their exceptions.
+ * 
  * @author lukas
  *
  */
