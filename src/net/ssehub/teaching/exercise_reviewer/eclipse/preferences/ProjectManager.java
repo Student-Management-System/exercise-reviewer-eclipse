@@ -36,7 +36,7 @@ public class ProjectManager {
      * @return String , the assessmentid
      * @throws ProjectException
      */
-    public Optional<String> getGroupNamer(String projectname) {
+    public Optional<String> getGroupName(String projectname) {
 
         Optional<String> groupname = Optional.ofNullable(preferences.get(projectname, null));
 

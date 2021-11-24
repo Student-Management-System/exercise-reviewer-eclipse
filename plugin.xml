@@ -92,6 +92,10 @@
                 ratio="0.50"/> 
         </perspectiveExtension> 
     </extension> 
+    
+    <extension point="org.eclipse.ui.startup">
+   <startup class="net.ssehub.teaching.exercise_reviewer.eclipse.actions.StartUp"/>
+    </extension>
    
  
 
