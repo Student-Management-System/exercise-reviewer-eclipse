@@ -31,29 +31,32 @@ public class ProjectSelectionListener implements ISelectionListener {
             Object element = ((IStructuredSelection) newSelection).getFirstElement();
             if (element instanceof IAdaptable) {
                 IResource resource = ((IAdaptable) element).getAdapter(IResource.class);
-                final IProject project = resource.getProject();
-
-                try {
-//                    PlatformUI.getWorkbench().getActiveWorkbenchWindow()
-//                 .getActivePage().getActiveEditor().setFocus();
-                    //TODO need to change
-                    AllReviewableSubmissionsView listview = (AllReviewableSubmissionsView)  
-                            PlatformUI.getWorkbench().getActiveWorkbenchWindow()
-                            .getActivePage().findView("net.ssehub.teaching.exercise_reviewer.eclipse.views."
-                                    + "allreviewablesubmissionsview");
-                            
-                    
-                    ReviewView reviewview = (ReviewView) PlatformUI.getWorkbench().getActiveWorkbenchWindow()
-                          .getActivePage().showView("net.ssehub.teaching.exercise_reviewer.eclipse.views.reviewview");
-                    
-                    reviewview.refreshReviewInformation(Activator.getDefault()
-                            .getProjectManager().getGroupNamer(project.getName()).orElse("not connected"),
-                            listview.getSelectedAssignment().orElse(
-                                new Assignment("Not available", "Not available", State.SUBMISSION, false)));
-                } catch (PartInitException e) {
-                    // TODO Auto-generated catch block
-                    e.printStackTrace();
-                } 
+                if (resource != null) {
+                    final IProject project = resource.getProject();
+    
+                    try {
+    //                    PlatformUI.getWorkbench().getActiveWorkbenchWindow()
+    //                 .getActivePage().getActiveEditor().setFocus();
+                        //TODO need to change
+                        AllReviewableSubmissionsView listview = (AllReviewableSubmissionsView)  
+                                PlatformUI.getWorkbench().getActiveWorkbenchWindow()
+                                .getActivePage().findView("net.ssehub.teaching.exercise_reviewer.eclipse.views."
+                                        + "allreviewablesubmissionsview");
+                                
+                        
+                        ReviewView reviewview = (ReviewView) PlatformUI.getWorkbench().getActiveWorkbenchWindow()
+                              .getActivePage()
+                              .showView("net.ssehub.teaching.exercise_reviewer.eclipse.views.reviewview");
+                        
+                        reviewview.refreshReviewInformation(Activator.getDefault()
+                                .getProjectManager().getGroupName(project.getName()).orElse("not connected"),
+                                listview.getSelectedAssignment().orElse(
+                                    new Assignment("Not available", "Not available", State.SUBMISSION, false)));
+                    } catch (PartInitException e) {
+                        // TODO Auto-generated catch block
+                        e.printStackTrace();
+                    } 
+                }
 
             }
         }
