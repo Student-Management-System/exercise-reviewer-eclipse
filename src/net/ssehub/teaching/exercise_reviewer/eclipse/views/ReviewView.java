@@ -29,7 +29,6 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
-import org.eclipse.swt.widgets.MessageBox;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
@@ -410,8 +409,8 @@ public class ReviewView extends ViewPart {
                 Display.getDefault().syncExec(() -> this.textPoints.setText(
                         Double.toString(assessment.getPoints().get())));
             }
-            if (assessment.getProblemlist() != null) {
-                problems = assessment.getProblemlist();
+            if (assessment.getProblems() != null) {
+                problems = assessment.getProblems();
                 Display.getDefault().syncExec(() -> {
                     for (Problem problem : problems) {
                         TableItem item = new TableItem(this.table, SWT.NONE);
