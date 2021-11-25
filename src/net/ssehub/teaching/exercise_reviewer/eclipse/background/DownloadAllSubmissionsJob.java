@@ -8,9 +8,9 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 import java.util.function.Consumer;
 
 import org.eclipse.core.resources.IProject;
@@ -34,11 +34,12 @@ import net.ssehub.teaching.exercise_reviewer.eclipse.Activator;
 import net.ssehub.teaching.exercise_reviewer.eclipse.dialog.AdvancedExceptionDialog;
 import net.ssehub.teaching.exercise_reviewer.eclipse.dialog.DownloadAllResultDialog;
 import net.ssehub.teaching.exercise_reviewer.eclipse.log.EclipseLog;
+import net.ssehub.teaching.exercise_submitter.lib.ExerciseSubmitterManager;
 import net.ssehub.teaching.exercise_submitter.lib.data.Assignment;
 import net.ssehub.teaching.exercise_submitter.lib.replay.ReplayException;
 import net.ssehub.teaching.exercise_submitter.lib.replay.Replayer;
 import net.ssehub.teaching.exercise_submitter.lib.student_management_system.ApiException;
-import net.ssehub.teaching.exercise_submitter.lib.student_management_system.GroupNotFoundException;
+import net.ssehub.teaching.exercise_submitter.lib.student_management_system.IApiConnection;
 
 /**
  * This class is a job to handle the download process for the submissions.
@@ -151,33 +152,43 @@ public class DownloadAllSubmissionsJob extends ReviewerJobs {
         IWorkingSetManager workingsetmanager = PlatformUI.getWorkbench().getWorkingSetManager();
 
         try {
-            Set<String> set = Activator.getDefault().getManager().getStudentManagementConnection()
-                    .getAllGroups(Activator.getDefault().getManager().getCourse(), this.assignment);
-            List<String> listNames = new ArrayList<>(set);
+            ExerciseSubmitterManager manager = Activator.getDefault().getManager();
+            IApiConnection api = manager.getStudentManagementConnection();
+            List<String> allGroups = new ArrayList<>(api.getAllGroups(manager.getCourse(), this.assignment));
 
-            SubMonitor submonitor = SubMonitor.convert(monitor, listNames.size());
+            SubMonitor submonitor = SubMonitor.convert(monitor, allGroups.size());
+            List<Replayer> replayers = new LinkedList<>();
 
-            for (String string : listNames) {
-                Project project = new Project(string);
-                Replayer replayer = null;
-                File file = null;
+            for (String group : allGroups) {
+                Project project = new Project(group);
                 try {
-                    replayer = Activator.getDefault().getManager().getReplayer(this.assignment);
-                    file = replayer.replayLatest(string);
+                    Replayer replayer = manager.getReplayer(this.assignment, group);
+                    replayers.add(replayer);
+                    
+                    File temporaryCheckout = replayer.replayLatest();
                     submonitor.split(1).done();
-                    project.setFile(file);
-                    this.createIProject(project, string);
-                } catch (ReplayException | GroupNotFoundException | CoreException e) {
+                    project.setFile(temporaryCheckout);
+                    createIProject(project, group);
+                } catch (ReplayException | CoreException e) {
                     project.setException(e);
                 }
                 this.projects.add(project);
                 submonitor.split(1).done();
-
             }
 
             this.createWorkingSetAndAddProjects(workingsetmanager);
 
             copyDownloadedProjects();
+            
+            // close all replayers after the project files have been copied; this deletes the temporary checkouts
+            for (Replayer replayer : replayers) {
+                try {
+                    replayer.close();
+                } catch (IOException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                }
+            }
             
             Display.getDefault().syncExec(() -> {
                 DownloadAllResultDialog dialog = new DownloadAllResultDialog(getShell().orElse(new Shell()), projects);
