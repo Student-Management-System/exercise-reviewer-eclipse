@@ -222,6 +222,7 @@ public class AllReviewableSubmissionsView extends ViewPart {
      * Called when the refresh button is clicked.
      */
     private void clickRefresh() {
+        retrieveAssignments();
         this.swtList.removeAll();
         if (this.selectedAssignment.isPresent()) {
             ListSubmissionsJob job = new ListSubmissionsJob(this.getSite().getShell(), this::onListSubmissionFinished,

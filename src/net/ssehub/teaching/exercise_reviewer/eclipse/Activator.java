@@ -3,11 +3,15 @@ package net.ssehub.teaching.exercise_reviewer.eclipse;
 import java.io.IOException;
 import java.util.Properties;
 
+import org.eclipse.equinox.security.storage.StorageException;
+import org.eclipse.jface.dialogs.MessageDialog;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
 
 import net.ssehub.teaching.exercise_reviewer.eclipse.dialog.AdvancedExceptionDialog;
 import net.ssehub.teaching.exercise_reviewer.eclipse.log.EclipseLog;
+import net.ssehub.teaching.exercise_reviewer.eclipse.preferences.PreferencePage;
 import net.ssehub.teaching.exercise_reviewer.eclipse.preferences.ProjectManager;
 import net.ssehub.teaching.exercise_submitter.lib.ExerciseSubmitterFactory;
 import net.ssehub.teaching.exercise_submitter.lib.ExerciseSubmitterManager;
@@ -61,8 +65,8 @@ public class Activator extends AbstractUIPlugin {
             Properties prop = new Properties();
             prop.load(Activator.class.getResourceAsStream("config.properties"));
 
-            String username = "adam"; // PreferencePage.SECURE_PREFERENCES.get(PreferencePage.KEY_USERNAME, ""); TODO
-            String password = "123456"; // PreferencePage.SECURE_PREFERENCES.get(PreferencePage.KEY_PASSWORD, "");
+            String username =  PreferencePage.SECURE_PREFERENCES.get(PreferencePage.KEY_USERNAME, ""); 
+            String password =  PreferencePage.SECURE_PREFERENCES.get(PreferencePage.KEY_PASSWORD, "");
 
             EclipseLog.info("Creating manager with username " + username);
             ExerciseSubmitterFactory factory = new ExerciseSubmitterFactory();
@@ -85,12 +89,16 @@ public class Activator extends AbstractUIPlugin {
                     "User not enrolled in course or course does not exist");
             // TODO: more user-friendly dialog?
         } catch (AuthenticationException e) {
-            AdvancedExceptionDialog.showUnexpectedExceptionDialog(e, "Failed to log into student management system");
+            Display.getDefault().syncExec(() -> MessageDialog.openError(
+                    Display.getCurrent().getActiveShell(), 
+                    "Auth Error", "Cant login. Please check your username and password"));
             // TODO: more user-friendly dialog
         } catch (ApiException e) {
             AdvancedExceptionDialog.showUnexpectedExceptionDialog(e, "Generic API exception");
         } catch (IOException e) {
             AdvancedExceptionDialog.showUnexpectedExceptionDialog(e, "Cant read config file");
+        } catch (StorageException e) {
+            AdvancedExceptionDialog.showUnexpectedExceptionDialog(e, "Cant load username and password");
         }
     }
 

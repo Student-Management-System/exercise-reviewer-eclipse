@@ -96,6 +96,15 @@
     <extension point="org.eclipse.ui.startup">
    <startup class="net.ssehub.teaching.exercise_reviewer.eclipse.actions.StartUp"/>
     </extension>
+    
+     <extension
+          point="org.eclipse.ui.preferencePages">
+       <page
+             class="net.ssehub.teaching.exercise_reviewer.eclipse.preferences.PreferencePage"
+             id="net.ssehub.teaching.exercise_reviewer.eclipse.preferences.PreferencePage"
+             name="Exercise Reviewer">
+       </page>
+    </extension>
    
  
 
