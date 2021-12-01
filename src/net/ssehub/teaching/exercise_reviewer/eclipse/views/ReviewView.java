@@ -5,6 +5,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.eclipse.core.filesystem.EFS;
 import org.eclipse.core.filesystem.IFileStore;
@@ -228,7 +229,9 @@ public class ReviewView extends ViewPart {
              */
             @Override
             public void run() {
+                
                 clickUpload();
+                
             }
         };
         this.uploadAction.setImageDescriptor(this.getImageDescriptor("icons/upload.png"));
@@ -289,8 +292,20 @@ public class ReviewView extends ViewPart {
                         uploadAssessment.setComment(comment.orElse(new Comment("Not Available", page)).getComment());
                         Display.getDefault().syncExec(() -> uploadAssessment.setPoints(
                                 Double.parseDouble(textPoints.getText())));
-                        manager.getStudentManagementConnection().uploadAssessment(manager.getCourse(), assignment.get(),
-                                groupname.get(), uploadAssessment);
+                        AtomicBoolean questionResult = new AtomicBoolean();
+                        Display.getDefault().syncExec(() ->  {
+                            questionResult.set(MessageDialog.openQuestion(getSite().getShell(), "Uploading",
+                                    "Assessment will be uploaded with following content: \n"
+                                    + "Comment: " + comment.orElse(new Comment("Not Available", page)) + "\n"
+                                    + "Points: " +  textPoints.getText()));     
+                        });
+                        if (questionResult.get()) {
+                            manager.getStudentManagementConnection().uploadAssessment(manager.getCourse(),
+                                    assignment.get(), groupname.get(), uploadAssessment);
+                        } else {
+                            success = false;
+                        }
+                                
                     } catch (ApiException e) {
                         success = false;
                     } catch (NumberFormatException e) {
@@ -408,6 +423,8 @@ public class ReviewView extends ViewPart {
             if (assessment.getPoints().isPresent()) {
                 Display.getDefault().syncExec(() -> this.textPoints.setText(
                         Double.toString(assessment.getPoints().get())));
+            } else {
+                Display.getDefault().syncExec(() -> this.textPoints.setText(""));
             }
             if (assessment.getProblems() != null) {
                 problems = assessment.getProblems();
@@ -448,7 +465,7 @@ public class ReviewView extends ViewPart {
         } else {
             Display.getDefault().syncExec(() -> {
                 MessageDialog.openError(job.getShell().orElse(new Shell()), "Upload Assessment", 
-                        "Assessment uploading failed");
+                        "Assessment uploading failed or aborted by the user");
             });
         }
     }
