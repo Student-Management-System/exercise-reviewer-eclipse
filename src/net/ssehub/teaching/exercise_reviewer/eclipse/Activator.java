@@ -67,13 +67,14 @@ public class Activator extends AbstractUIPlugin {
 
             String username =  PreferencePage.SECURE_PREFERENCES.get(PreferencePage.KEY_USERNAME, ""); 
             String password =  PreferencePage.SECURE_PREFERENCES.get(PreferencePage.KEY_PASSWORD, "");
+            
 
             EclipseLog.info("Creating manager with username " + username);
             ExerciseSubmitterFactory factory = new ExerciseSubmitterFactory();
             factory
             .withUsername(username)
             .withPassword(password)
-            .withCourse("java-wise2021") // TODO: get course from config
+            .withCourse(prop.getProperty("courseid")) // TODO: get course from config
             .withAuthUrl(prop.getProperty("authurl"))
             .withMgmtUrl(prop.getProperty("mgmturl"))
                 .withExerciseSubmitterServerUrl(prop.getProperty("exerciseSubmitterUrl"));
