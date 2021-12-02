@@ -115,7 +115,7 @@ public class ReviewView extends ViewPart {
         this.table.setLinesVisible(true);
         this.table.setHeaderVisible(true);
 
-        String[] columns = {"Description", "Path", "Line", "Column" };
+        String[] columns = {"Check", "Message", "Path", "Line", "Column" };
 
         for (String column : columns) {
             TableColumn tc = new TableColumn(this.table, SWT.LEFT);
@@ -429,13 +429,15 @@ public class ReviewView extends ViewPart {
             if (assessment.getProblems() != null) {
                 problems = assessment.getProblems();
                 Display.getDefault().syncExec(() -> {
+                    this.table.removeAll();
+                    
                     for (Problem problem : problems) {
                         TableItem item = new TableItem(this.table, SWT.NONE);
-                        item.setText(0, problem.getMessage());
-                        item.setText(1, problem.getFile().orElse(new File("Not loading")).toString());
-                        item.setText(2, problem.getLine().get().toString());
-                        item.setText(3, problem.getColumn().get().toString());
-
+                        item.setText(0, problem.getCheckName());
+                        item.setText(1, problem.getMessage());
+                        item.setText(2, problem.getFile().map(File::toString).orElse(""));
+                        item.setText(3, problem.getLine().map(Object::toString).orElse(""));
+                        item.setText(4, problem.getColumn().map(Object::toString).orElse(""));
                     }
 
                     for (int i = 0; i < this.table.getColumnCount(); i++) {
@@ -447,7 +449,7 @@ public class ReviewView extends ViewPart {
         } else {
 
             Display.getDefault().syncExec(() -> {
-                this.table.clearAll();
+                this.table.removeAll();
 
             });
         }
