@@ -37,6 +37,7 @@ import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorPart;
+import org.eclipse.ui.IPartListener;
 import org.eclipse.ui.ISelectionListener;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.PartInitException;
@@ -51,6 +52,7 @@ import net.ssehub.teaching.exercise_reviewer.eclipse.Activator;
 import net.ssehub.teaching.exercise_reviewer.eclipse.background.IRunnableStuMgmt;
 import net.ssehub.teaching.exercise_reviewer.eclipse.background.StuMgmtJob;
 import net.ssehub.teaching.exercise_reviewer.eclipse.dialog.AdvancedExceptionDialog;
+import net.ssehub.teaching.exercise_reviewer.eclipse.listener.EditorFocusChangeListener;
 import net.ssehub.teaching.exercise_reviewer.eclipse.listener.ProjectSelectionListener;
 import net.ssehub.teaching.exercise_submitter.lib.ExerciseSubmitterManager;
 import net.ssehub.teaching.exercise_submitter.lib.data.Assessment;
@@ -86,7 +88,8 @@ public class ReviewView extends ViewPart {
     private Optional<Assessment> assessment = Optional.empty();
     private List<Problem> problems = new ArrayList<Problem>();
 
-    private ISelectionListener listener = new ProjectSelectionListener();
+    private ISelectionListener projectchangelistener = new ProjectSelectionListener();
+    private IPartListener editorchangelistener = new EditorFocusChangeListener();
 
     /**
      * Creates an instance of the ReviewView class.
@@ -153,7 +156,8 @@ public class ReviewView extends ViewPart {
     @Override
     public void dispose() {
         // important: We need do unregister our listener when the view is disposed
-        this.getSite().getWorkbenchWindow().getSelectionService().removeSelectionListener(this.listener);
+        this.getSite().getWorkbenchWindow().getSelectionService().removeSelectionListener(this.projectchangelistener);
+        this.getSite().getWorkbenchWindow().getPartService().removePartListener(this.editorchangelistener);
         super.dispose();
     }
 
@@ -245,7 +249,8 @@ public class ReviewView extends ViewPart {
      * Creates the selection listener.
      */
     private void createSelectionListener() {
-        this.getSite().getWorkbenchWindow().getSelectionService().addPostSelectionListener(this.listener);
+        this.getSite().getWorkbenchWindow().getSelectionService().addPostSelectionListener(this.projectchangelistener);
+        this.getSite().getWorkbenchWindow().getPartService().addPartListener(this.editorchangelistener);
     }
 
     /**
