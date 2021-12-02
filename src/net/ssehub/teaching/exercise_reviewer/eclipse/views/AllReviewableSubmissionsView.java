@@ -312,6 +312,7 @@ public class AllReviewableSubmissionsView extends ViewPart {
         this.assignments = Optional.ofNullable(job.getOutput());
         Display.getDefault().syncExec(() -> {
             if (this.assignments.isPresent()) {
+                this.combo.removeAll();
                 for (Assignment assignment : this.assignments.get()) {
                     this.combo.add(assignment.getName());
                 }
