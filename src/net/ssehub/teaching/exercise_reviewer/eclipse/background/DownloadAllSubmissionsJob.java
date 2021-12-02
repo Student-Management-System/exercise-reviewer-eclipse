@@ -25,10 +25,13 @@ import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
+import org.eclipse.ui.IViewPart;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.IWorkingSet;
 import org.eclipse.ui.IWorkingSetManager;
 import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.views.navigator.IResourceNavigator;
+import org.eclipse.ui.views.navigator.ResourceNavigator;
 
 import net.ssehub.teaching.exercise_reviewer.eclipse.Activator;
 import net.ssehub.teaching.exercise_reviewer.eclipse.dialog.AdvancedExceptionDialog;
@@ -179,8 +182,8 @@ public class DownloadAllSubmissionsJob extends ReviewerJobs {
             this.createWorkingSetAndAddProjects(workingsetmanager);
 
             copyDownloadedProjects();
+                     
             
-            // close all replayers after the project files have been copied; this deletes the temporary checkouts
             for (Replayer replayer : replayers) {
                 try {
                     replayer.close();
@@ -212,7 +215,8 @@ public class DownloadAllSubmissionsJob extends ReviewerJobs {
                     this.copyProject(element.getFile().get().toPath(), 
                             element.project.get().getLocation().toFile().toPath());
                     this.copyDefaultClasspath(element.project.get().getLocation().toFile().toPath());
-                } catch (IOException e) {
+                    element.project.get().refreshLocal(IResource.DEPTH_INFINITE, new NullProgressMonitor());
+                } catch (IOException | CoreException e) {
                     //element.setException(e);
                 }
             }
@@ -243,8 +247,9 @@ public class DownloadAllSubmissionsJob extends ReviewerJobs {
         }
 
         if (!alreadyExisting) {
-            IWorkingSet newSet = workingsetmanager.createWorkingSet(this.assignment.getName(), projectsArray);
+            IWorkingSet newSet = workingsetmanager.createWorkingSet(this.assignment.getName(), projectsArray);          
             workingsetmanager.addWorkingSet(newSet);
+            //TODO: need to refresh gui or something
         }
     }
 
@@ -276,7 +281,6 @@ public class DownloadAllSubmissionsJob extends ReviewerJobs {
         } catch (CoreException e) {
             EclipseLog.warning("Failed to set java nature for new project: " + e.getMessage());
         }
-        newProject.refreshLocal(IResource.DEPTH_INFINITE, new NullProgressMonitor());
 
         Activator.getDefault().getProjectManager().setConnection(projectName, groupname);
 
