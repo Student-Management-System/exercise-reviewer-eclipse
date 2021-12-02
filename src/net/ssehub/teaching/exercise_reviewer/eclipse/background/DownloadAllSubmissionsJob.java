@@ -25,13 +25,11 @@ import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
-import org.eclipse.ui.IViewPart;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.IWorkingSet;
 import org.eclipse.ui.IWorkingSetManager;
 import org.eclipse.ui.PlatformUI;
-import org.eclipse.ui.views.navigator.IResourceNavigator;
-import org.eclipse.ui.views.navigator.ResourceNavigator;
+
 
 import net.ssehub.teaching.exercise_reviewer.eclipse.Activator;
 import net.ssehub.teaching.exercise_reviewer.eclipse.dialog.AdvancedExceptionDialog;
