@@ -2,6 +2,8 @@ package net.ssehub.teaching.exercise_reviewer.eclipse.views;
 
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Optional;
 
 import org.eclipse.core.runtime.Platform;
@@ -288,6 +290,21 @@ public class AllReviewableSubmissionsView extends ViewPart {
                 java.util.List<Assignment> assignments = null;
                 try {
                     assignments = Activator.getDefault().getManager().getAllAssignments();
+                    
+                    Collections.sort(assignments, Comparator
+                            .comparing(Assignment::getState, Comparator.comparingInt((Assignment.State s) -> {
+                                int order = 5;
+                                switch (s) {
+                                case IN_REVIEW: order = 0; break;
+                                case REVIEWED: order = 1; break;
+                                case CLOSED: order = 2; break;
+                                case INVISIBLE: order = 3; break;
+                                case SUBMISSION: order = 4; break;
+                                default: order = 5; break;
+                                }
+                                return order;
+                            }))
+                            .thenComparing(Assignment::getName));
                 } catch (ApiException e) {
                     Display.getDefault().syncExec(() -> {
                         AdvancedExceptionDialog.showUnexpectedExceptionDialog(e, "Cant load assignments");
@@ -317,7 +334,7 @@ public class AllReviewableSubmissionsView extends ViewPart {
                 int indexToSelect = 0;
                 int index = 0;
                 for (Assignment assignment : this.assignments.get()) {
-                    this.combo.add(assignment.getName());
+                    this.combo.add(assignment.getName() + " " + assignment.getState());
                     if (assignment.getName().equals(previouslySelectedAssignmentName)) {
                         indexToSelect = index;
                     }
