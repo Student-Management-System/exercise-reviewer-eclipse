@@ -312,14 +312,21 @@ public class AllReviewableSubmissionsView extends ViewPart {
         this.assignments = Optional.ofNullable(job.getOutput());
         Display.getDefault().syncExec(() -> {
             if (this.assignments.isPresent()) {
+                String previouslySelectedAssignmentName = selectedAssignment.map(Assignment::getName).orElse(null);
                 this.combo.removeAll();
+                int indexToSelect = 0;
+                int index = 0;
                 for (Assignment assignment : this.assignments.get()) {
                     this.combo.add(assignment.getName());
+                    if (assignment.getName().equals(previouslySelectedAssignmentName)) {
+                        indexToSelect = index;
+                    }
+                    index++;
                 }
                 this.combo.pack();
-                if (this.assignments.get().size() > 0) {
-                    this.selectedAssignment = Optional.ofNullable(this.assignments.get().get(0));
-                    this.combo.select(0);
+                if (this.assignments.get().size() > indexToSelect) {
+                    this.selectedAssignment = Optional.ofNullable(this.assignments.get().get(indexToSelect));
+                    this.combo.select(indexToSelect);
                 }
             }
         });
