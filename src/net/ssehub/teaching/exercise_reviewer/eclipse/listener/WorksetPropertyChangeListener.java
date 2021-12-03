@@ -32,7 +32,7 @@ public class WorksetPropertyChangeListener implements IPropertyChangeListener {
             IWorkingSet workingset = (IWorkingSet) event.getOldValue();
             List<IProject> projects = new ArrayList<IProject>();
             for (IAdaptable adaptable : workingset.getElements()) {
-                projects.add(((IAdaptable) adaptable).getAdapter(IProject.class));
+                projects.add(adaptable.getAdapter(IProject.class));
             }
             //TODO: maybe to to in background
             IRunnableStuMgmt<Boolean> func = new IRunnableStuMgmt<Boolean>() {
