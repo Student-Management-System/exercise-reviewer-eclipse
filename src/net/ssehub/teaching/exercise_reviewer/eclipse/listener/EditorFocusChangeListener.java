@@ -58,7 +58,7 @@ public class EditorFocusChangeListener implements IPartListener {
                         
                     } catch (PartInitException e) {
                         Display.getDefault().syncExec(() 
-                               -> AdvancedExceptionDialog.showUnexpectedExceptionDialog(e,
+                            -> AdvancedExceptionDialog.showUnexpectedExceptionDialog(e,
                                "Cant open Review view"));
                     }
                     
