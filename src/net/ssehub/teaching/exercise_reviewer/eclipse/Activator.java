@@ -80,8 +80,6 @@ public class Activator extends AbstractUIPlugin {
                 .withExerciseSubmitterServerUrl(prop.getProperty("exerciseSubmitterUrl"));
             this.manager = factory.build();
 
-            //        } catch (StorageException ex) {
-            // AdvancedExceptionDialog.showUnexpectedExceptionDialog(ex, "Failed to load login data from preferences");
         } catch (NetworkException e) {
             AdvancedExceptionDialog.showUnexpectedExceptionDialog(e, "Failed to connect to student management system");
             // TODO: more user-friendly dialog?
@@ -99,7 +97,7 @@ public class Activator extends AbstractUIPlugin {
         } catch (IOException e) {
             AdvancedExceptionDialog.showUnexpectedExceptionDialog(e, "Cant read config file");
         } catch (StorageException e) {
-            AdvancedExceptionDialog.showUnexpectedExceptionDialog(e, "Cant load username and password");
+            AdvancedExceptionDialog.showUnexpectedExceptionDialog(e, "Failed to load login data from preferences");
         }
     }
 
@@ -110,7 +108,7 @@ public class Activator extends AbstractUIPlugin {
      */
     public synchronized ExerciseSubmitterManager getManager() {
         if (this.manager == null) {
-            this.initManager();
+            initManager();
         }
         // TODO: this returns null if init failed and thus causes NullPointerExceptions all over the place
         return this.manager;
