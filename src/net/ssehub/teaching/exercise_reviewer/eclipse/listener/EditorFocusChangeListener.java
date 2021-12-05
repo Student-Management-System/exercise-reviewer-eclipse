@@ -39,22 +39,16 @@ public class EditorFocusChangeListener implements IPartListener {
                 IProject project = file.getProject();
                 
                 if (project != null)  {
-                    String projectname = project.getName();
-                    AllReviewableSubmissionsView listview = (AllReviewableSubmissionsView)  
-                            PlatformUI.getWorkbench().getActiveWorkbenchWindow()
-                            .getActivePage().findView("net.ssehub.teaching.exercise_reviewer.eclipse.views."
-                                    + "allreviewablesubmissionsview");
-                            
-                    
+                  
                     ReviewView reviewview;
                     try {
                         reviewview = (ReviewView) PlatformUI.getWorkbench().getActiveWorkbenchWindow()
                               .getActivePage()
                               .showView("net.ssehub.teaching.exercise_reviewer.eclipse.views.reviewview");
                         reviewview.refreshReviewInformation(Activator.getDefault()
-                                .getProjectManager().getGroupName(projectname).orElse("not connected"),
-                                listview.getSelectedAssignment().orElse(
-                                        new Assignment("Not available", "Not available", State.SUBMISSION, false)));
+                                .getProjectManager().getGroupName(project).orElse("not connected"),
+                                Activator.getDefault().getProjectManager().getAssignmentId(project)
+                                .orElse("not available"));
                         
                     } catch (PartInitException e) {
                         Display.getDefault().syncExec(() 

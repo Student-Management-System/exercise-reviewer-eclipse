@@ -262,7 +262,7 @@ public class DownloadAllSubmissionsJob extends ReviewerJobs {
     private boolean createIProject(Project project, String groupname) throws CoreException {
         boolean isCreated = false;
 
-        String projectName = "Submission from " + groupname;
+        String projectName = "Submission from " + groupname + " for " + assignment.getName();
         IWorkspace workspace = ResourcesPlugin.getWorkspace();
         IWorkspaceRoot root = workspace.getRoot();
         IProject newProject = root.getProject(projectName);
@@ -280,7 +280,8 @@ public class DownloadAllSubmissionsJob extends ReviewerJobs {
             EclipseLog.warning("Failed to set java nature for new project: " + e.getMessage());
         }
 
-        Activator.getDefault().getProjectManager().setConnection(projectName, groupname);
+        Activator.getDefault().getProjectManager()
+        .setConnection(project.getProject().get(), groupname, assignment.getManagementId());
 
         return isCreated;
     }

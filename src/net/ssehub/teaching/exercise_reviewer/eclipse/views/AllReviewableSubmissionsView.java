@@ -141,7 +141,7 @@ public class AllReviewableSubmissionsView extends ViewPart {
 
                             reviewview.refreshReviewInformation(
                                     AllReviewableSubmissionsView.this.groupNames.get().get(selected),
-                                    AllReviewableSubmissionsView.this.selectedAssignment.get());
+                                    AllReviewableSubmissionsView.this.selectedAssignment.get().getManagementId());
                         }
                     }
                 } catch (PartInitException e) {

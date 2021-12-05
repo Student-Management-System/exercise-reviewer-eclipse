@@ -49,7 +49,7 @@ public class ListSubmissionsJob extends ReviewerJobs {
         this.callbackCheckSubmission.accept(this);
 
     }
-
+    
     /**
      * Retrieves the assessmentlist from the server.
      */

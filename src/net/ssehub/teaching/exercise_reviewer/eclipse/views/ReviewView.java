@@ -57,6 +57,7 @@ import net.ssehub.teaching.exercise_reviewer.eclipse.listener.ProjectSelectionLi
 import net.ssehub.teaching.exercise_submitter.lib.ExerciseSubmitterManager;
 import net.ssehub.teaching.exercise_submitter.lib.data.Assessment;
 import net.ssehub.teaching.exercise_submitter.lib.data.Assignment;
+import net.ssehub.teaching.exercise_submitter.lib.data.Assignment.State;
 import net.ssehub.teaching.exercise_submitter.lib.student_management_system.ApiException;
 import net.ssehub.teaching.exercise_submitter.lib.submission.Problem;
 
@@ -380,16 +381,61 @@ public class ReviewView extends ViewPart {
      * Refreshes the review data with the current submission.
      *
      * @param groupName
-     * @param assignment
+     * @param assignmentid
      */
-    public void refreshReviewInformation(String groupName, Assignment assignment) {
+    public void refreshReviewInformation(String groupName, String assignmentid) {
+        
+        ExerciseSubmitterManager manager = Activator.getDefault().getManager();
+        IRunnableStuMgmt<Assignment> func = new IRunnableStuMgmt<Assignment>() {
 
-        this.assignment = Optional.ofNullable(assignment);
+            @Override
+            public Assignment run() {
+                Assignment assignment = null;
+             
+                    List<Assignment> listassignment;
+                    try {
+                        listassignment = manager.getStudentManagementConnection()
+                                .getAssignments(manager.getCourse());
+                        assignment = listassignment.stream().filter(element -> element.getManagementId()
+                                .equals(assignmentid)).findFirst()
+                                .orElse(new Assignment("not available", "not available", State.SUBMISSION, true));
+                    } catch (ApiException e) {
+                        // TODO Auto-generated catch block
+                        e.printStackTrace();
+                    }
+              
+                return assignment;
+            }
+            
+        };
+        
         this.groupname = Optional.ofNullable(groupName);
+        
+        StuMgmtJob<Assignment> getAssignmentjob = 
+                new StuMgmtJob<Assignment>("getAssignment", func, this::onFinishedGetAssignment);
+        getAssignmentjob.setUser(true);
+        getAssignmentjob.schedule();
 
-        this.labelProject.setText(assignment.getName());
+     
 
-        this.labelUsers.setText(groupName);
+       
+    }
+    /**
+     * Gets called when the assignments are downloaded and the job is done.
+     * 
+     * @param job
+     */
+    private void onFinishedGetAssignment(StuMgmtJob<Assignment> job) {
+        Assignment assignmentoutput = job.getOutput();
+        this.assignment = Optional.ofNullable(assignmentoutput);
+       
+
+        Display.getDefault().syncExec(() -> {
+            this.labelProject.setText(this.assignment.orElse(
+                    new Assignment("", "not available", State.SUBMISSION, true)).getName());
+        
+            this.labelUsers.setText(this.groupname.orElse("not available"));
+        });
 
         ExerciseSubmitterManager manager = Activator.getDefault().getManager();
         IRunnableStuMgmt<Assessment> func = new IRunnableStuMgmt<Assessment>() {
@@ -399,7 +445,9 @@ public class ReviewView extends ViewPart {
                 Assessment assessment = null;
                 try {
                     assessment = manager.getStudentManagementConnection()
-                            .getAssessment(manager.getCourse(), assignment, groupName).orElse(new Assessment());
+                            .getAssessment(manager.getCourse(),  assignment.orElse(
+                                    new Assignment("", "not available", State.SUBMISSION, true)) ,
+                                    groupname.orElse("not available")).orElse(new Assessment());
                 } catch (ApiException e) {
                     System.out.println(e);
                 }
@@ -407,14 +455,18 @@ public class ReviewView extends ViewPart {
             }
 
         };
-        StuMgmtJob<Assessment> job = new StuMgmtJob<Assessment>("refreshInformation", func, this::onFinishedStumgmtJob);
-        job.setUser(true);
-        job.schedule();
+        StuMgmtJob<Assessment> getAssessmentjob = 
+                new StuMgmtJob<Assessment>("refreshInformation", func, this::onFinishedStumgmtJob);
+        getAssessmentjob.setUser(true);
+        getAssessmentjob.schedule();
+        
 
-        this.labelProject.pack();
-        this.labelUsers.pack();
+        Display.getDefault().syncExec(() -> {
+            this.labelProject.pack();
+            this.labelUsers.pack();
+        });
+
     }
-
     /**
      * When the job is finished.
      *
