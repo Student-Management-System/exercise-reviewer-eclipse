@@ -5,9 +5,8 @@ import java.util.Optional;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.QualifiedName;
-import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.swt.widgets.Display;
-import org.osgi.service.prefs.Preferences;
+
 
 import net.ssehub.teaching.exercise_reviewer.eclipse.Activator;
 
@@ -20,7 +19,7 @@ import net.ssehub.teaching.exercise_reviewer.eclipse.Activator;
  */
 public class ProjectManager {
 
-    private static Preferences preferences = InstanceScope.INSTANCE.getNode(Activator.PLUGIN_ID);
+   
     private static final QualifiedName CONNECTED_ASSIGNMENT_NAME = new QualifiedName(Activator.PLUGIN_ID, "assignment");
     private static final QualifiedName CONNECTED_GROUP_NAME = new QualifiedName(Activator.PLUGIN_ID, "groupname");
     /**

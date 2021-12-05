@@ -11,10 +11,8 @@ import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 
 import net.ssehub.teaching.exercise_reviewer.eclipse.Activator;
-import net.ssehub.teaching.exercise_reviewer.eclipse.views.AllReviewableSubmissionsView;
 import net.ssehub.teaching.exercise_reviewer.eclipse.views.ReviewView;
-import net.ssehub.teaching.exercise_submitter.lib.data.Assignment;
-import net.ssehub.teaching.exercise_submitter.lib.data.Assignment.State;
+
 
 /**
  * This class handles the project change selection event.

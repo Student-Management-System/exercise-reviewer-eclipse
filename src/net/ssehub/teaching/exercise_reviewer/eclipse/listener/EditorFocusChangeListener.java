@@ -11,10 +11,8 @@ import org.eclipse.ui.PlatformUI;
 
 import net.ssehub.teaching.exercise_reviewer.eclipse.Activator;
 import net.ssehub.teaching.exercise_reviewer.eclipse.dialog.AdvancedExceptionDialog;
-import net.ssehub.teaching.exercise_reviewer.eclipse.views.AllReviewableSubmissionsView;
 import net.ssehub.teaching.exercise_reviewer.eclipse.views.ReviewView;
-import net.ssehub.teaching.exercise_submitter.lib.data.Assignment;
-import net.ssehub.teaching.exercise_submitter.lib.data.Assignment.State;
+
 
 /**
  *This class gets called when a IPart is change.
