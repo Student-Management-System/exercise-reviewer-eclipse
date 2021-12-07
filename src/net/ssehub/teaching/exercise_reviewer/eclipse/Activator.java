@@ -15,6 +15,7 @@ import net.ssehub.teaching.exercise_reviewer.eclipse.preferences.PreferencePage;
 import net.ssehub.teaching.exercise_reviewer.eclipse.preferences.ProjectManager;
 import net.ssehub.teaching.exercise_submitter.lib.ExerciseSubmitterFactory;
 import net.ssehub.teaching.exercise_submitter.lib.ExerciseSubmitterManager;
+import net.ssehub.teaching.exercise_submitter.lib.data.Course;
 import net.ssehub.teaching.exercise_submitter.lib.student_management_system.ApiException;
 import net.ssehub.teaching.exercise_submitter.lib.student_management_system.AuthenticationException;
 import net.ssehub.teaching.exercise_submitter.lib.student_management_system.NetworkException;
@@ -79,6 +80,15 @@ public class Activator extends AbstractUIPlugin {
             .withMgmtUrl(prop.getProperty("mgmturl"))
                 .withExerciseSubmitterServerUrl(prop.getProperty("exerciseSubmitterUrl"));
             this.manager = factory.build();
+            
+            boolean tutorrights = this.manager.getStudentManagementConnection()
+                    .hasTutorRights(new Course(prop.getProperty("courseid")
+                    , prop.getProperty("courseid")));
+            if (!tutorrights) {
+                Display.getDefault().syncExec(() -> MessageDialog.openError(
+                        Display.getDefault().getActiveShell(), "Login failed - Eclipse Reviewer",
+                        "In Course " + this.manager.getCourse().getId() + " not registered as a Tutor"));
+            } 
 
         } catch (NetworkException e) {
             AdvancedExceptionDialog.showUnexpectedExceptionDialog(e, "Failed to connect to student management system");
