@@ -78,6 +78,7 @@ public class ReviewView extends ViewPart {
     private Button reviewButton;
 
     private Action uploadAction;
+    private Action refreshmanagerConnection;
 
     private Table table;
     
@@ -241,8 +242,22 @@ public class ReviewView extends ViewPart {
         };
         this.uploadAction.setImageDescriptor(this.getImageDescriptor("icons/upload.png"));
         
+        this.refreshmanagerConnection = new Action("Refresh internet connection") {
+            /**
+             * Creates the button press action.
+             */
+            @Override
+            public void run() {
+                
+                Activator.getDefault().getManager();
+                
+            }
+        };
+        this.refreshmanagerConnection.setImageDescriptor(this.getImageDescriptor("icons/refresh.png"));
+        
         IToolBarManager mgr = this.getViewSite().getActionBars().getToolBarManager();
         mgr.add(this.uploadAction);
+        mgr.add(refreshmanagerConnection);
 
     }
 
@@ -384,7 +399,7 @@ public class ReviewView extends ViewPart {
      * @param assignmentid
      */
     public void refreshReviewInformation(String groupName, String assignmentid) {
-        
+       
         ExerciseSubmitterManager manager = Activator.getDefault().getManager();
         IRunnableStuMgmt<Assignment> func = new IRunnableStuMgmt<Assignment>() {
 
@@ -411,14 +426,16 @@ public class ReviewView extends ViewPart {
         
         this.groupname = Optional.ofNullable(groupName);
         
-        StuMgmtJob<Assignment> getAssignmentjob = 
-                new StuMgmtJob<Assignment>("getAssignment", func, this::onFinishedGetAssignment);
-        getAssignmentjob.setUser(true);
-        getAssignmentjob.schedule();
-
-     
-
-       
+        if (Activator.getDefault().isConnected()) {
+            StuMgmtJob<Assignment> getAssignmentjob = 
+                    new StuMgmtJob<Assignment>("getAssignment", func, this::onFinishedGetAssignment);
+            getAssignmentjob.setUser(true);
+            getAssignmentjob.schedule();
+        } else {
+            this.labelProject.setText("Please reconnect");
+            this.labelProject.pack();
+        }
+   
     }
     /**
      * Gets called when the assignments are downloaded and the job is done.

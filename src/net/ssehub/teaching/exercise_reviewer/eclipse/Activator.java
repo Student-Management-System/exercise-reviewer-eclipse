@@ -35,6 +35,8 @@ public class Activator extends AbstractUIPlugin {
     private ExerciseSubmitterManager manager;
 
     private ProjectManager projectmanager;
+    
+    private boolean isConnected = false;
 
     /**
      * Creates an instance of the Activator.
@@ -89,26 +91,37 @@ public class Activator extends AbstractUIPlugin {
                         Display.getDefault().getActiveShell(), "Login failed - Eclipse Reviewer",
                         "In Course " + this.manager.getCourse().getId() + " not registered as a Tutor"));
             } 
+            
+            isConnected = true;
 
         } catch (NetworkException e) {
-            AdvancedExceptionDialog.showUnexpectedExceptionDialog(e, "Failed to connect to student management system");
+            AdvancedExceptionDialog.showUnexpectedExceptionDialog(e, "Failed to connect to student management system \n"
+                    + "Check you internet connection");
+            isConnected = false;
             // TODO: more user-friendly dialog?
         } catch (UserNotInCourseException e) {
             AdvancedExceptionDialog.showUnexpectedExceptionDialog(e,
                     "User not enrolled in course or course does not exist");
+            isConnected = false;
             // TODO: more user-friendly dialog?
         } catch (AuthenticationException e) {
             Display.getDefault().syncExec(() -> MessageDialog.openError(
                     Display.getCurrent().getActiveShell(), 
                     "Auth Error", "Cant login. Please check your username and password"));
+            isConnected = false;
             // TODO: more user-friendly dialog
         } catch (ApiException e) {
             AdvancedExceptionDialog.showUnexpectedExceptionDialog(e, "Generic API exception");
+            isConnected = false;
         } catch (IOException e) {
             AdvancedExceptionDialog.showUnexpectedExceptionDialog(e, "Cant read config file");
+            isConnected = false;
         } catch (StorageException e) {
             AdvancedExceptionDialog.showUnexpectedExceptionDialog(e, "Failed to load login data from preferences");
+            isConnected = false;
         }
+        
+        
     }
 
     /**
@@ -117,7 +130,7 @@ public class Activator extends AbstractUIPlugin {
      * @return The {@link ExerciseSubmitterManager}.
      */
     public synchronized ExerciseSubmitterManager getManager() {
-        if (this.manager == null) {
+        if (this.manager == null || !this.isConnected) {
             initManager();
         }
         // TODO: this returns null if init failed and thus causes NullPointerExceptions all over the place
@@ -153,6 +166,15 @@ public class Activator extends AbstractUIPlugin {
      */
     public static Activator getDefault() {
         return plugin;
+    }
+
+    /**
+     * Returns the if the manager is connected successfully.
+     * 
+     * @return is connected.
+     */
+    public synchronized boolean isConnected() {
+        return isConnected;
     }
 
 }
