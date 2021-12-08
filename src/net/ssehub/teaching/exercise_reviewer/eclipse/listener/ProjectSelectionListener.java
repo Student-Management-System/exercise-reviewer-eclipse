@@ -33,9 +33,7 @@ public class ProjectSelectionListener implements ISelectionListener {
                     final IProject project = resource.getProject();
     
                     try {
-    //                    PlatformUI.getWorkbench().getActiveWorkbenchWindow()
-    //                 .getActivePage().getActiveEditor().setFocus();
-                        //TODO need to change
+    //                
                         
                                 
                         ReviewView reviewview = (ReviewView) PlatformUI.getWorkbench().getActiveWorkbenchWindow()

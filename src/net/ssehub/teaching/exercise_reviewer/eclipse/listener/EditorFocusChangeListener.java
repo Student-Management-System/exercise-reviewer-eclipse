@@ -30,7 +30,7 @@ public class EditorFocusChangeListener implements IPartListener {
 
     @Override
     public void partBroughtToTop(IWorkbenchPart part) {
-        // TODO Auto-generated method stub
+        
         if (part instanceof IEditorPart) {
             IFile file = ((IEditorPart) part).getEditorInput().getAdapter(IFile.class);
             if (file != null) {

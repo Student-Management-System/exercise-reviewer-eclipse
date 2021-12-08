@@ -152,7 +152,7 @@ public class AllReviewableSubmissionsView extends ViewPart {
 
             @Override
             public void widgetDefaultSelected(SelectionEvent arg0) {
-                // TODO Auto-generated method stub
+               
 
             }
         });
@@ -198,7 +198,7 @@ public class AllReviewableSubmissionsView extends ViewPart {
 
                     @Override
                     public void widgetDefaultSelected(SelectionEvent arg0) {
-                        // TODO Auto-generated method stub
+                      
 
                     }
                 });
@@ -259,7 +259,7 @@ public class AllReviewableSubmissionsView extends ViewPart {
 
             @Override
             public void widgetDefaultSelected(SelectionEvent event) {
-                // TODO Auto-generated method stub
+              
 
             }
 
@@ -281,7 +281,7 @@ public class AllReviewableSubmissionsView extends ViewPart {
      * Retrieves the assignments from the server.
      */
     private void retrieveAssignments() {
-        // TODO maybe as a background job too
+     
 
         IRunnableStuMgmt<java.util.List<Assignment>> func = new IRunnableStuMgmt<java.util.List<Assignment>>() {
 

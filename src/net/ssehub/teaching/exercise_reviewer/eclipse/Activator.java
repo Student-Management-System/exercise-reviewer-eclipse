@@ -77,7 +77,7 @@ public class Activator extends AbstractUIPlugin {
             factory
             .withUsername(username)
             .withPassword(password)
-            .withCourse(prop.getProperty("courseid")) // TODO: get course from config
+            .withCourse(prop.getProperty("courseid"))
             .withAuthUrl(prop.getProperty("authurl"))
             .withMgmtUrl(prop.getProperty("mgmturl"))
                 .withExerciseSubmitterServerUrl(prop.getProperty("exerciseSubmitterUrl"));

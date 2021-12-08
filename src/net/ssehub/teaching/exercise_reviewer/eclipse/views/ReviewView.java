@@ -143,7 +143,7 @@ public class ReviewView extends ViewPart {
             
             @Override
             public void widgetDefaultSelected(SelectionEvent arg0) {
-                // TODO Auto-generated method stub
+               
                 
             }
         });
@@ -289,7 +289,7 @@ public class ReviewView extends ViewPart {
 
             @Override
             public void widgetDefaultSelected(SelectionEvent arg0) {
-                // TODO Auto-generated method stub
+              
 
             }
         });
@@ -372,7 +372,7 @@ public class ReviewView extends ViewPart {
                 }
                 
             } catch (CoreException | BadLocationException e) {
-                // TODO Auto-generated catch block
+               
                 e.printStackTrace();
             }
         }

@@ -75,7 +75,7 @@ public class DownloadAllResultDialog extends Dialog {
             
             @Override
             public void widgetDefaultSelected(SelectionEvent arg0) {
-                // TODO Auto-generated method stub
+              
                 
             }
         });

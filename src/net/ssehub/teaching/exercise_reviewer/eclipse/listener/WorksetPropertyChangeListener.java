@@ -34,7 +34,7 @@ public class WorksetPropertyChangeListener implements IPropertyChangeListener {
             for (IAdaptable adaptable : workingset.getElements()) {
                 projects.add(adaptable.getAdapter(IProject.class));
             }
-            //TODO: maybe to to in background
+           
             IRunnableStuMgmt<Boolean> func = new IRunnableStuMgmt<Boolean>() {
                 
                 @Override

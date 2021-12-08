@@ -13,7 +13,7 @@ import net.ssehub.teaching.exercise_reviewer.eclipse.Activator;
 
 
 /**
- * Saves the assessmentId for the projects dowbloaded.
+ * Saves the assessmentId for the projects downloaded.
  * @author lukas
  *
  */
