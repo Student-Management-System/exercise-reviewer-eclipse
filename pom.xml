@@ -1,16 +1,16 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
-  <modelVersion>4.0.0</modelVersion>
-  <groupId>net.ssehub.teaching.exercise_reviewer</groupId>
-  <artifactId>exercise-reviewer-eclipse</artifactId>
-  <version>0.0.1-SNAPSHOT</version>
-  <packaging>eclipse-plugin</packaging>
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>net.ssehub.teaching.exercise_reviewer</groupId>
+    <artifactId>exercise-reviewer-eclipse</artifactId>
+    <version>0.0.1-SNAPSHOT</version>
+    <packaging>eclipse-plugin</packaging>
 
     <organization>
         <name>Software Systems Engineering, University of Hildesheim</name>
         <url>https://sse.uni-hildesheim.de/</url>
     </organization>
-  
-  <licenses>
+
+    <licenses>
         <license>
             <name>Apache-2.0</name>
             <url>https://www.apache.org/licenses/LICENSE-2.0.html</url>
@@ -29,8 +29,8 @@
             <url>http://download.eclipse.org/releases/latest</url>
         </repository>
     </repositories>
-  
-  <build>
+
+    <build>
         <plugins>
             <plugin>
                 <groupId>org.eclipse.tycho</groupId>
@@ -53,7 +53,7 @@
                 <artifactId>tycho-versions-plugin</artifactId>
                 <version>${tycho.version}</version>
             </plugin>
-            
+
 
             <plugin>
                 <groupId>org.eclipse.tycho</groupId>
@@ -75,7 +75,7 @@
                     </environments>
                 </configuration>
             </plugin>
-            
+
             <plugin>
                 <artifactId>maven-dependency-plugin</artifactId>
                 <version>3.2.0</version>
@@ -94,8 +94,8 @@
                     </execution>
                 </executions>
             </plugin>
-            
-          <plugin>
+
+            <plugin>
                 <artifactId>maven-checkstyle-plugin</artifactId>
                 <version>3.1.2</version>
                 <configuration>
@@ -118,12 +118,19 @@
                         </goals>
                     </execution>
                 </executions>
+                <dependencies>
+                    <dependency>
+                        <groupId>com.puppycrawl.tools</groupId>
+                        <artifactId>checkstyle</artifactId>
+                        <version>9.2</version>
+                    </dependency>
+                </dependencies>
             </plugin>
-            
-            
+
+
         </plugins>
     </build>
-    
+
     <dependencies>
         <dependency>
             <groupId>net.ssehub.teaching.exercise_submitter</groupId>
@@ -131,6 +138,6 @@
             <version>0.0.1-SNAPSHOT</version>
         </dependency>
     </dependencies>
-    
-    </project>
+
+</project>
     
