@@ -8,7 +8,6 @@ import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.expressions.IEvaluationContext;
 import org.eclipse.ui.ISources;
 import org.eclipse.ui.IWorkbenchWindow;
-import org.eclipse.ui.handlers.HandlerUtil;
 
 import net.ssehub.teaching.exercise_reviewer.eclipse.Activator;
 import net.ssehub.teaching.exercise_reviewer.eclipse.background.IRunnableStuMgmt;
@@ -18,8 +17,6 @@ import net.ssehub.teaching.exercise_reviewer.eclipse.dialog.ExceptionDialog;
 import net.ssehub.teaching.exercise_submitter.lib.data.Course;
 import net.ssehub.teaching.exercise_submitter.lib.student_management_system.ApiException;
 
-import org.eclipse.jface.dialogs.MessageDialog;
-import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.swt.widgets.Display;
 
 /**
@@ -28,10 +25,10 @@ import org.eclipse.swt.widgets.Display;
  *
  */
 public class SettingAction extends AbstractHandler {
+    private IWorkbenchWindow window;
 
     @Override
     public Object execute(ExecutionEvent event) throws ExecutionException {
-        IWorkbenchWindow window = null;
 
         if (event.getApplicationContext() instanceof IEvaluationContext) {
             IEvaluationContext context = (IEvaluationContext) event.getApplicationContext();
@@ -71,7 +68,7 @@ public class SettingAction extends AbstractHandler {
         if (job.getOutput() != null) {
             Display.getDefault().syncExec(() -> {
                 
-                CourseSelectionDialog dialog = new CourseSelectionDialog(Display.getDefault().getActiveShell()
+                CourseSelectionDialog dialog = new CourseSelectionDialog(window.getShell()
                         , job.getOutput());
                 dialog.open();
             });
