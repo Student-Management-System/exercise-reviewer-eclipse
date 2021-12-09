@@ -16,5 +16,6 @@ Automatic-Module-Name: exercise.reviewer.eclipse
 Bundle-ClassPath: .,
  target/dependency/exercise-submitter-lib-jar-with-dependencies.jar
 Bundle-ActivationPolicy: lazy
-Import-Package: org.eclipse.jface.text
+Import-Package: org.eclipse.core.expressions,
+ org.eclipse.jface.text
 

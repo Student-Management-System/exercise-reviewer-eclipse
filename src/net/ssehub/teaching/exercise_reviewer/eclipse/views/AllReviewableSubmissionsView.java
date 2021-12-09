@@ -35,7 +35,7 @@ import net.ssehub.teaching.exercise_reviewer.eclipse.background.DownloadAllSubmi
 import net.ssehub.teaching.exercise_reviewer.eclipse.background.IRunnableStuMgmt;
 import net.ssehub.teaching.exercise_reviewer.eclipse.background.ListSubmissionsJob;
 import net.ssehub.teaching.exercise_reviewer.eclipse.background.StuMgmtJob;
-import net.ssehub.teaching.exercise_reviewer.eclipse.dialog.AdvancedExceptionDialog;
+import net.ssehub.teaching.exercise_reviewer.eclipse.dialog.ExceptionDialog;
 import net.ssehub.teaching.exercise_submitter.lib.data.Assignment;
 import net.ssehub.teaching.exercise_submitter.lib.student_management_system.ApiException;
 
@@ -241,8 +241,7 @@ public class AllReviewableSubmissionsView extends ViewPart {
     private void clickDownloadAll() {
         if (this.selectedAssignment.isPresent()) {
             DownloadAllSubmissionsJob job = new DownloadAllSubmissionsJob(this.getSite().getShell(),
-                    this.selectedAssignment.get(), this::onDownloadAllSubmissionsFinished,
-                    PlatformUI.getWorkbench().getActiveWorkbenchWindow());
+                    this.selectedAssignment.get(), PlatformUI.getWorkbench().getActiveWorkbenchWindow());
             job.setUser(true);
             job.schedule();
         }
@@ -307,7 +306,7 @@ public class AllReviewableSubmissionsView extends ViewPart {
                             .thenComparing(Assignment::getName));
                 } catch (ApiException e) {
                     Display.getDefault().syncExec(() -> {
-                        AdvancedExceptionDialog.showUnexpectedExceptionDialog(e, "Cant load assignments");
+                        ExceptionDialog.showUnexpectedExceptionDialog(e, "Cant load assignments");
                     });
                 }
                 return assignments;
@@ -366,14 +365,6 @@ public class AllReviewableSubmissionsView extends ViewPart {
         }
     }
 
-    /**
-     * When download all job is finished.
-     *
-     * @param job
-     */
-    private void onDownloadAllSubmissionsFinished(DownloadAllSubmissionsJob job) {
-
-    }
     /**
      * Gets the selected Assignment from the combobox.
      * @return Optional<Assignment>

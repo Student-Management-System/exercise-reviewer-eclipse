@@ -10,7 +10,7 @@ import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 
 import net.ssehub.teaching.exercise_reviewer.eclipse.Activator;
-import net.ssehub.teaching.exercise_reviewer.eclipse.dialog.AdvancedExceptionDialog;
+import net.ssehub.teaching.exercise_reviewer.eclipse.dialog.ExceptionDialog;
 import net.ssehub.teaching.exercise_reviewer.eclipse.views.ReviewView;
 
 
@@ -50,7 +50,7 @@ public class EditorFocusChangeListener implements IPartListener {
                         
                     } catch (PartInitException e) {
                         Display.getDefault().syncExec(() 
-                            -> AdvancedExceptionDialog.showUnexpectedExceptionDialog(e,
+                            -> ExceptionDialog.showUnexpectedExceptionDialog(e,
                                "Cant open Review view"));
                     }
                     

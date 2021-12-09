@@ -11,7 +11,7 @@ import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
 
 import net.ssehub.teaching.exercise_reviewer.eclipse.Activator;
-import net.ssehub.teaching.exercise_reviewer.eclipse.dialog.AdvancedExceptionDialog;
+import net.ssehub.teaching.exercise_reviewer.eclipse.dialog.ExceptionDialog;
 
 
 /**
@@ -56,7 +56,7 @@ public class PreferencePage extends FieldEditorPreferencePage implements IWorkbe
             this.password.setStringValue(SECURE_PREFERENCES.get(KEY_PASSWORD, ""));
             
         } catch (StorageException ex) {
-            AdvancedExceptionDialog.showUnexpectedExceptionDialog(ex, "Failed to load preferences");
+            ExceptionDialog.showUnexpectedExceptionDialog(ex, "Failed to load preferences");
         }
     }
 
@@ -71,7 +71,7 @@ public class PreferencePage extends FieldEditorPreferencePage implements IWorkbe
             Activator.getDefault().initManager();
             
         } catch (StorageException | IOException ex) {
-            AdvancedExceptionDialog.showUnexpectedExceptionDialog(ex, "Failed to store preferences");
+            ExceptionDialog.showUnexpectedExceptionDialog(ex, "Failed to store preferences");
         }
         
         return true;

@@ -51,7 +51,7 @@ import org.osgi.framework.Bundle;
 import net.ssehub.teaching.exercise_reviewer.eclipse.Activator;
 import net.ssehub.teaching.exercise_reviewer.eclipse.background.IRunnableStuMgmt;
 import net.ssehub.teaching.exercise_reviewer.eclipse.background.StuMgmtJob;
-import net.ssehub.teaching.exercise_reviewer.eclipse.dialog.AdvancedExceptionDialog;
+import net.ssehub.teaching.exercise_reviewer.eclipse.dialog.ExceptionDialog;
 import net.ssehub.teaching.exercise_reviewer.eclipse.listener.EditorFocusChangeListener;
 import net.ssehub.teaching.exercise_reviewer.eclipse.listener.ProjectSelectionListener;
 import net.ssehub.teaching.exercise_submitter.lib.ExerciseSubmitterManager;
@@ -281,7 +281,7 @@ public class ReviewView extends ViewPart {
                     try {
                         ReviewView.this.comment.get().openEditor();
                     } catch (PartInitException e) {
-                        AdvancedExceptionDialog.showUnexpectedExceptionDialog(e, "Cant open Editor");
+                        ExceptionDialog.showUnexpectedExceptionDialog(e, "Cant open Editor");
                     }
                 }
 

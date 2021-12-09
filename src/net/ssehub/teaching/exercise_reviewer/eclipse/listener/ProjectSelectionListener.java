@@ -34,8 +34,7 @@ public class ProjectSelectionListener implements ISelectionListener {
     
                     try {
     //                
-                        
-                                
+                         
                         ReviewView reviewview = (ReviewView) PlatformUI.getWorkbench().getActiveWorkbenchWindow()
                               .getActivePage()
                               .showView("net.ssehub.teaching.exercise_reviewer.eclipse.views.reviewview");

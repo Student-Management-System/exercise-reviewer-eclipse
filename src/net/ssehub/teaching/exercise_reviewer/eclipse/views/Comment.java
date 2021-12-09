@@ -15,7 +15,7 @@ import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.ide.IDE;
 
-import net.ssehub.teaching.exercise_reviewer.eclipse.dialog.AdvancedExceptionDialog;
+import net.ssehub.teaching.exercise_reviewer.eclipse.dialog.ExceptionDialog;
 
 /**
  * This class handles the comment for the assessment.
@@ -53,7 +53,7 @@ public class Comment {
             this.file.deleteOnExit();
             this.writeCommentInFile();
         } catch (IOException e) {
-            AdvancedExceptionDialog.showUnexpectedExceptionDialog(e, "Cant load comment");
+            ExceptionDialog.showUnexpectedExceptionDialog(e, "Cant load comment");
         }
     }
 
@@ -96,7 +96,7 @@ public class Comment {
             stringcomment = Files.readString(this.file.toPath());
         } catch (IOException e) {
             Display.getDefault().syncExec(() -> {
-                AdvancedExceptionDialog.showUnexpectedExceptionDialog(e, "Cant load comment");
+                ExceptionDialog.showUnexpectedExceptionDialog(e, "Cant load comment");
                 
             });
         }

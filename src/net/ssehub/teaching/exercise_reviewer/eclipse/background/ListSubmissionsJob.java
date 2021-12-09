@@ -10,7 +10,7 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 
 import net.ssehub.teaching.exercise_reviewer.eclipse.Activator;
-import net.ssehub.teaching.exercise_reviewer.eclipse.dialog.AdvancedExceptionDialog;
+import net.ssehub.teaching.exercise_reviewer.eclipse.dialog.ExceptionDialog;
 import net.ssehub.teaching.exercise_submitter.lib.ExerciseSubmitterManager;
 import net.ssehub.teaching.exercise_submitter.lib.data.Assignment;
 import net.ssehub.teaching.exercise_submitter.lib.student_management_system.ApiException;
@@ -67,7 +67,7 @@ public class ListSubmissionsJob extends ReviewerJobs {
 
         } catch (ApiException e) {
             Display.getDefault().syncExec(
-                () -> AdvancedExceptionDialog.showUnexpectedExceptionDialog(e, "Cant retrieve group list"));
+                () -> ExceptionDialog.showUnexpectedExceptionDialog(e, "Cant retrieve group list"));
         }
     }
 
