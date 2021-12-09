@@ -11,7 +11,6 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
-import java.util.function.Consumer;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IProjectDescription;
@@ -52,7 +51,6 @@ public class DownloadAllSubmissionsJob extends ReviewerJobs {
 
     private Assignment assignment;
     private List<Project> projects = new ArrayList<Project>();
-    private Consumer<DownloadAllSubmissionsJob> callbackDownloadAllSubmissionsJob;
     private IWorkbenchWindow window;
 
     /**
@@ -136,14 +134,11 @@ public class DownloadAllSubmissionsJob extends ReviewerJobs {
      *
      * @param shell
      * @param assignment
-     * @param callbackDownloadAllSubmissionsJob
      * @param window
      */
-    public DownloadAllSubmissionsJob(Shell shell, Assignment assignment,
-            Consumer<DownloadAllSubmissionsJob> callbackDownloadAllSubmissionsJob, IWorkbenchWindow window) {
+    public DownloadAllSubmissionsJob(Shell shell, Assignment assignment, IWorkbenchWindow window) {
         super("Download all Submissions", Optional.ofNullable(shell));
         this.assignment = assignment;
-        this.callbackDownloadAllSubmissionsJob = callbackDownloadAllSubmissionsJob;
         this.window = window;
     }
 
@@ -169,7 +164,7 @@ public class DownloadAllSubmissionsJob extends ReviewerJobs {
                     File temporaryCheckout = replayer.replayLatest();
                     submonitor.split(1).done();
                     project.setFile(temporaryCheckout);
-                    createIProject(project, group);
+                    createIProject(project);
                 } catch (ReplayException | CoreException e) {
                     project.setException(e);
                 }
@@ -254,14 +249,14 @@ public class DownloadAllSubmissionsJob extends ReviewerJobs {
     /**
      * Creates the IProject.
      *
-     * @param groupname
      * @param project
      * @return boolean , true if it worked.
      * @throws CoreException
      */
-    private boolean createIProject(Project project, String groupname) throws CoreException {
+    private boolean createIProject(Project project) throws CoreException {
         boolean isCreated = false;
 
+        String groupname = project.getGroupName();
         String projectName = "Submission from " + groupname + " for " + assignment.getName();
         IWorkspace workspace = ResourcesPlugin.getWorkspace();
         IWorkspaceRoot root = workspace.getRoot();
