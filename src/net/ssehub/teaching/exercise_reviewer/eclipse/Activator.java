@@ -9,7 +9,7 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
 
-import net.ssehub.teaching.exercise_reviewer.eclipse.dialog.AdvancedExceptionDialog;
+import net.ssehub.teaching.exercise_reviewer.eclipse.dialog.ExceptionDialog;
 import net.ssehub.teaching.exercise_reviewer.eclipse.log.EclipseLog;
 import net.ssehub.teaching.exercise_reviewer.eclipse.preferences.PreferencePage;
 import net.ssehub.teaching.exercise_reviewer.eclipse.preferences.ProjectManager;
@@ -70,6 +70,7 @@ public class Activator extends AbstractUIPlugin {
 
             String username =  PreferencePage.SECURE_PREFERENCES.get(PreferencePage.KEY_USERNAME, ""); 
             String password =  PreferencePage.SECURE_PREFERENCES.get(PreferencePage.KEY_PASSWORD, "");
+            //String courseid = 
             
 
             EclipseLog.info("Creating manager with username " + username);
@@ -95,29 +96,27 @@ public class Activator extends AbstractUIPlugin {
             isConnected = true;
 
         } catch (NetworkException e) {
-            AdvancedExceptionDialog.showUnexpectedExceptionDialog(e, "Failed to connect to student management system \n"
+            ExceptionDialog.showUnexpectedExceptionDialog(e, "Failed to connect to student management system \n"
                     + "Check you internet connection");
             isConnected = false;
-            // TODO: more user-friendly dialog?
+            
         } catch (UserNotInCourseException e) {
-            AdvancedExceptionDialog.showUnexpectedExceptionDialog(e,
+            ExceptionDialog.showUnexpectedExceptionDialog(e,
                     "User not enrolled in course or course does not exist");
             isConnected = false;
-            // TODO: more user-friendly dialog?
+       
         } catch (AuthenticationException e) {
-            Display.getDefault().syncExec(() -> MessageDialog.openError(
-                    Display.getCurrent().getActiveShell(), 
-                    "Auth Error", "Cant login. Please check your username and password"));
+            ExceptionDialog.showLoginFailed();
             isConnected = false;
-            // TODO: more user-friendly dialog
         } catch (ApiException e) {
-            AdvancedExceptionDialog.showUnexpectedExceptionDialog(e, "Generic API exception");
+            ExceptionDialog.showUnexpectedExceptionDialog(e, "Generic API exception");
+            
             isConnected = false;
         } catch (IOException e) {
-            AdvancedExceptionDialog.showUnexpectedExceptionDialog(e, "Cant read config file");
+            ExceptionDialog.showUnexpectedExceptionDialog(e, "Cant read config file");
             isConnected = false;
         } catch (StorageException e) {
-            AdvancedExceptionDialog.showUnexpectedExceptionDialog(e, "Failed to load login data from preferences");
+            ExceptionDialog.showUnexpectedExceptionDialog(e, "Failed to load login data from preferences");
             isConnected = false;
         }
         

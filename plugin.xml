@@ -10,15 +10,15 @@
       </category>
       <command
             categoryId="exercise-reviewer-eclipse.commands.category"
-            name="Sample Command"
-            id="exercise-reviewer-eclipse.commands.sampleCommand">
+            name="Select Course"
+            id="exercise-reviewer-eclipse.commands.SettingAction">
       </command>
    </extension>
    <extension
          point="org.eclipse.ui.handlers">
       <handler
-            class="net.ssehub.teaching.exercise_reviewer.eclipse.actions.SampleHandler"
-            commandId="exercise-reviewer-eclipse.commands.sampleCommand">
+            class="net.ssehub.teaching.exercise_reviewer.eclipse.actions.SettingAction"
+            commandId="exercise-reviewer-eclipse.commands.SettingAction">
       </handler>
    </extension>
    <extension
@@ -35,30 +35,17 @@
       <menuContribution
             locationURI="menu:org.eclipse.ui.main.menu?after=additions">
          <menu
-               id="exercise-reviewer-eclipse.menus.sampleMenu"
-               label="Sample Menu"
+               id="exercise-reviewer-eclipse.menus.settings"
+               label="Exercises reviewer Settings"
                mnemonic="M">
             <command
-                  commandId="exercise-reviewer-eclipse.commands.sampleCommand"
-                  id="exercise-reviewer-eclipse.menus.sampleCommand"
+                  commandId="exercise-reviewer-eclipse.commands.SettingAction"
+                  id="exercise-reviewer-eclipse.menus.SettingAction"
                   mnemonic="S">
             </command>
          </menu>
       </menuContribution>
-      <menuContribution
-            locationURI="toolbar:org.eclipse.ui.main.toolbar?after=additions">
-         <toolbar
-               id="exercise-reviewer-eclipse.toolbars.sampleToolbar">
-            <command
-                  id="exercise-reviewer-eclipse.toolbars.sampleCommand"
-                  commandId="exercise-reviewer-eclipse.commands.sampleCommand"
-                  icon="icons/sample.png"
-                  tooltip="Say hello world">
-            </command>
-         </toolbar>
-      </menuContribution>
    </extension>
-   
    <extension point="org.eclipse.ui.views">
         <view id="net.ssehub.teaching.exercise_reviewer.eclipse.views.reviewview"
              name="Review View"
