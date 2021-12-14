@@ -26,6 +26,8 @@ public class PreferencePage extends FieldEditorPreferencePage implements IWorkbe
 
     public static final String KEY_PASSWORD = "net.ssehub.teaching.exercise_reviewer.eclipse.config.password";
     
+    public static final String KEY_COURSEID = "net.ssehub.teaching.exercise_reviewer.eclipse.config.courseid";
+    
     public static final ISecurePreferences SECURE_PREFERENCES = SecurePreferencesFactory.getDefault();
     
     private StringFieldEditor username;

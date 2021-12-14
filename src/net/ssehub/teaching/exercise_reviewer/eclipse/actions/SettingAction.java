@@ -6,6 +6,8 @@ import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.expressions.IEvaluationContext;
+import org.eclipse.equinox.security.storage.StorageException;
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.ui.ISources;
 import org.eclipse.ui.IWorkbenchWindow;
 
@@ -14,6 +16,7 @@ import net.ssehub.teaching.exercise_reviewer.eclipse.background.IRunnableStuMgmt
 import net.ssehub.teaching.exercise_reviewer.eclipse.background.StuMgmtJob;
 import net.ssehub.teaching.exercise_reviewer.eclipse.dialog.CourseSelectionDialog;
 import net.ssehub.teaching.exercise_reviewer.eclipse.dialog.ExceptionDialog;
+import net.ssehub.teaching.exercise_reviewer.eclipse.preferences.PreferencePage;
 import net.ssehub.teaching.exercise_submitter.lib.data.Course;
 import net.ssehub.teaching.exercise_submitter.lib.student_management_system.ApiException;
 
@@ -71,6 +74,23 @@ public class SettingAction extends AbstractHandler {
                 CourseSelectionDialog dialog = new CourseSelectionDialog(window.getShell()
                         , job.getOutput());
                 dialog.open();
+                
+                if (dialog.getSelectedCourse().isPresent()) {
+                    
+                    try {
+                        PreferencePage.SECURE_PREFERENCES.put(PreferencePage.KEY_COURSEID,
+                                dialog.getSelectedCourse().get()
+                                .getId(), true);
+                        Activator.getDefault().getManager().setCourse(dialog.getSelectedCourse().get());
+                    } catch (StorageException e) {
+                        ExceptionDialog
+                           .showUnexpectedExceptionDialog(e, "Cant save courseid");
+                    } 
+                    
+                } else {
+                    MessageDialog.openWarning(Display.getDefault().getActiveShell(),
+                            "Course Selection", "No Course Selected");
+                }
             });
    
         } 

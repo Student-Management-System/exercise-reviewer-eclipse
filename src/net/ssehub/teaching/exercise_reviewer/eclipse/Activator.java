@@ -70,15 +70,20 @@ public class Activator extends AbstractUIPlugin {
 
             String username =  PreferencePage.SECURE_PREFERENCES.get(PreferencePage.KEY_USERNAME, ""); 
             String password =  PreferencePage.SECURE_PREFERENCES.get(PreferencePage.KEY_PASSWORD, "");
-            //String courseid = 
+            String courseid = PreferencePage.SECURE_PREFERENCES.get(PreferencePage.KEY_COURSEID, ""); 
             
+            if (courseid.equals("")) {
+                courseid = null;
+                MessageDialog.openError(Display.getDefault().getActiveShell(), "No Course Selected",
+                        "You need to select a course: Reviewer Settings -> select course");
+            }
 
             EclipseLog.info("Creating manager with username " + username);
             ExerciseSubmitterFactory factory = new ExerciseSubmitterFactory();
             factory
             .withUsername(username)
             .withPassword(password)
-            .withCourse(prop.getProperty("courseid"))
+            .withCourse(courseid)
             .withAuthUrl(prop.getProperty("authurl"))
             .withMgmtUrl(prop.getProperty("mgmturl"))
                 .withExerciseSubmitterServerUrl(prop.getProperty("exerciseSubmitterUrl"));
@@ -146,6 +151,12 @@ public class Activator extends AbstractUIPlugin {
         }
 
         return this.projectmanager;
+    }
+    /**
+     * Clears the current ExerciseManager.
+     */
+    public synchronized void clearManager() {
+        this.manager = null;
     }
 
     /**
