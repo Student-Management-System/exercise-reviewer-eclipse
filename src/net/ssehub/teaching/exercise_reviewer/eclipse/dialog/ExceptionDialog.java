@@ -76,7 +76,59 @@ public class ExceptionDialog {
                "No Course selected. GOTO: Preferences -> Exercise Reviewer and select your Course"));
 
     }
-    
+    /**
+     * Creates the dialog if the connection for the server can not be estabilished.
+     */
+    public static void showConnectionCantBeEstabilished() {
+        runInGuiThread(() ->MessageDialog.openError(Display.getDefault().getActiveShell(), 
+                 "Exercise reviewer: Connection failed",
+               "Connecting to the Server failed. \n"
+               + "Check your Internet connection"));
+
+    }
+    /**
+     * Creates the dialog if the config file cant be opened/read.
+     */
+    public static void showConfigFileReadError() {
+        runInGuiThread(() ->MessageDialog.openError(Display.getDefault().getActiveShell(), 
+                 "Exercise reviewer: Read Config file failed",
+               "Reading the config File failed"));
+
+    }
+    /**
+     * Creates the dialog if the preferences cant be opened/read.
+     */
+    public static void showPreferenceReadError() {
+        runInGuiThread(() ->MessageDialog.openError(Display.getDefault().getActiveShell(), 
+                 "Exercise reviewer: Preference Read Error",
+               "The preferences cant be loaded \n"
+               + "Goto -> preferences -> Exerciese Reviewer and check if the credentials are"
+               + "entered \n"
+               + "Also check if the course -> Reviewer settings -> select course is selected"));
+
+    }
+    /**
+     * Creates the dialog if the user has no tutorights in the selected course.
+     */
+    public static void showNoTutorrights() {
+        runInGuiThread(() ->MessageDialog.openError(Display.getDefault().getActiveShell(), 
+                 "Exercise reviewer: No Tutorrights",
+                "The logedin user has no tutor rights in the selected Course \n" 
+                + "Check Reviewer settings -> selected course"));
+
+    }
+    /**
+     * Creates the dialog if the preferences cant be opened/read.
+     */
+    public static void showNotEnrolledInCourse() {
+        runInGuiThread(() ->MessageDialog.openError(Display.getDefault().getActiveShell(), 
+                 "Exercise reviewer: Not enrolled in Course",
+                "The logedin user is not enrolled in the course \n"
+                + "or the course dont exists \n"
+                + "Check Reviewer settings -> selected course"
+                + "Also check -> preferences -> Exerciese Reviewer the credentials"));
+
+    }
     
     
 }

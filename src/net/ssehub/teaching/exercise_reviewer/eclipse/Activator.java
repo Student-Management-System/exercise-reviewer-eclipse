@@ -93,35 +93,28 @@ public class Activator extends AbstractUIPlugin {
                     .hasTutorRights(new Course(courseid
                     , courseid));
             if (!tutorrights) {
-                Display.getDefault().syncExec(() -> MessageDialog.openError(
-                        Display.getDefault().getActiveShell(), "Login failed - Eclipse Reviewer",
-                        "In Course " + this.manager.getCourse().getId() + " not registered as a Tutor"));
+                ExceptionDialog.showNoTutorrights();
             } 
             
             isConnected = true;
 
         } catch (NetworkException e) {
-            ExceptionDialog.showUnexpectedExceptionDialog(e, "Failed to connect to student management system \n"
-                    + "Check your internet connection");
-            isConnected = false;
-            
+            ExceptionDialog.showConnectionCantBeEstabilished();
+            isConnected = false;  
         } catch (UserNotInCourseException e) {
-            ExceptionDialog.showUnexpectedExceptionDialog(e,
-                    "User not enrolled in course or course does not exist");
-            isConnected = false;
-       
+            ExceptionDialog.showNotEnrolledInCourse();
+            isConnected = false;     
         } catch (AuthenticationException e) {
             ExceptionDialog.showLoginFailed();
             isConnected = false;
         } catch (ApiException e) {
-            ExceptionDialog.showUnexpectedExceptionDialog(e, "Generic API exception");
-            
+            ExceptionDialog.showUnexpectedExceptionDialog(e, "Generic API exception");  
             isConnected = false;
         } catch (IOException e) {
-            ExceptionDialog.showUnexpectedExceptionDialog(e, "Cant read config file");
+            ExceptionDialog.showConfigFileReadError();
             isConnected = false;
         } catch (StorageException e) {
-            ExceptionDialog.showUnexpectedExceptionDialog(e, "Failed to load login data from preferences");
+            ExceptionDialog.showPreferenceReadError();
             isConnected = false;
         }
         
