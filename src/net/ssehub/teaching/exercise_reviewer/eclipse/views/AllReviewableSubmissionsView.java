@@ -36,6 +36,7 @@ import net.ssehub.teaching.exercise_reviewer.eclipse.background.IRunnableStuMgmt
 import net.ssehub.teaching.exercise_reviewer.eclipse.background.ListSubmissionsJob;
 import net.ssehub.teaching.exercise_reviewer.eclipse.background.StuMgmtJob;
 import net.ssehub.teaching.exercise_reviewer.eclipse.dialog.ExceptionDialog;
+import net.ssehub.teaching.exercise_submitter.lib.ExerciseSubmitterManager;
 import net.ssehub.teaching.exercise_submitter.lib.data.Assignment;
 import net.ssehub.teaching.exercise_submitter.lib.student_management_system.ApiException;
 
@@ -288,22 +289,26 @@ public class AllReviewableSubmissionsView extends ViewPart {
             public java.util.List<Assignment> run() {
                 java.util.List<Assignment> assignments = null;
                 try {
-                    assignments = Activator.getDefault().getManager().getAllAssignments();
-                    
-                    Collections.sort(assignments, Comparator
-                            .comparing(Assignment::getState, Comparator.comparingInt((Assignment.State s) -> {
-                                int order = 5;
-                                switch (s) {
-                                case IN_REVIEW: order = 0; break;
-                                case REVIEWED: order = 1; break;
-                                case CLOSED: order = 2; break;
-                                case INVISIBLE: order = 3; break;
-                                case SUBMISSION: order = 4; break;
-                                default: order = 5; break;
-                                }
-                                return order;
-                            }))
-                            .thenComparing(Assignment::getName));
+                    ExerciseSubmitterManager manager = Activator.getDefault().getManager();
+                    if (manager != null) {
+                        
+                        assignments = Activator.getDefault().getManager().getAllAssignments();
+                        
+                        Collections.sort(assignments, Comparator
+                                .comparing(Assignment::getState, Comparator.comparingInt((Assignment.State s) -> {
+                                    int order = 5;
+                                    switch (s) {
+                                    case IN_REVIEW: order = 0; break;
+                                    case REVIEWED: order = 1; break;
+                                    case CLOSED: order = 2; break;
+                                    case INVISIBLE: order = 3; break;
+                                    case SUBMISSION: order = 4; break;
+                                    default: order = 5; break;
+                                    }
+                                    return order;
+                                }))
+                                .thenComparing(Assignment::getName));
+                    }
                 } catch (ApiException e) {
                     Display.getDefault().syncExec(() -> {
                         ExceptionDialog.showUnexpectedExceptionDialog(e, "Cant load assignments");

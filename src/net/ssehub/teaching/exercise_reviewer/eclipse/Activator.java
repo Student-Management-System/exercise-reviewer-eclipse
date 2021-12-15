@@ -90,8 +90,8 @@ public class Activator extends AbstractUIPlugin {
             this.manager = factory.build();
             
             boolean tutorrights = this.manager.getStudentManagementConnection()
-                    .hasTutorRights(new Course(prop.getProperty("courseid")
-                    , prop.getProperty("courseid")));
+                    .hasTutorRights(new Course(courseid
+                    , courseid));
             if (!tutorrights) {
                 Display.getDefault().syncExec(() -> MessageDialog.openError(
                         Display.getDefault().getActiveShell(), "Login failed - Eclipse Reviewer",
@@ -102,7 +102,7 @@ public class Activator extends AbstractUIPlugin {
 
         } catch (NetworkException e) {
             ExceptionDialog.showUnexpectedExceptionDialog(e, "Failed to connect to student management system \n"
-                    + "Check you internet connection");
+                    + "Check your internet connection");
             isConnected = false;
             
         } catch (UserNotInCourseException e) {
