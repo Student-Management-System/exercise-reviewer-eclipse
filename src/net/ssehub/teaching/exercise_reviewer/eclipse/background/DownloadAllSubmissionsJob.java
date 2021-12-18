@@ -199,6 +199,72 @@ public class DownloadAllSubmissionsJob extends ReviewerJobs {
         }
     }
     /**
+     * Creates the IProject.
+     *
+     * @param project
+     * @return boolean , true if it worked.
+     * @throws CoreException
+     */
+    private boolean createIProject(Project project) throws CoreException {
+        boolean isCreated = false;
+    
+        String groupname = project.getGroupName();
+        String projectName = "Submission from " + groupname + " for " + assignment.getName();
+        IWorkspace workspace = ResourcesPlugin.getWorkspace();
+        IWorkspaceRoot root = workspace.getRoot();
+        IProject newProject = root.getProject(projectName);
+        newProject.create(null);
+        newProject.open(null);
+        project.setIProject(newProject);
+        isCreated = true;
+    
+    
+        try {
+            IProjectDescription description = newProject.getDescription();
+            description.setNatureIds(new String[] {"org.eclipse.jdt.core.javanature"});
+            newProject.setDescription(description, null);
+        } catch (CoreException e) {
+            EclipseLog.warning("Failed to set java nature for new project: " + e.getMessage());
+        }
+    
+        Activator.getDefault().getProjectManager()
+        .setConnection(project.getProject().get(), groupname, assignment.getManagementId());
+    
+        return isCreated;
+    }
+
+    /**
+     * Creates the workingset and adds the projects.
+     * @param workingsetmanager
+     */
+    private void createWorkingSetAndAddProjects(IWorkingSetManager workingsetmanager) {
+        IProject[] projectsArray = new IProject[this.projects.size()];
+        for (int i = 0; i < this.projects.size(); i++) {
+            if (this.projects.get(i).isSucceeded()) {
+                projectsArray[i] = this.projects.get(i).getProject().get();
+            }
+        }
+    
+        IWorkingSet[] sets = workingsetmanager.getAllWorkingSets();
+    
+        boolean alreadyExisting = false;
+    
+        for (IWorkingSet element : sets) {
+            if (element.getName().equals(this.assignment.getName())) {
+                element.setElements(projectsArray);
+                alreadyExisting = true;
+                break;
+            }
+        }
+    
+        if (!alreadyExisting) {
+            IWorkingSet newSet = workingsetmanager.createWorkingSet(this.assignment.getName(), projectsArray);          
+            workingsetmanager.addWorkingSet(newSet);
+            //TODO: need to refresh gui or something
+        }
+    }
+
+    /**
      * Copys the downloaded files to the projectfolders.
      */
     private void copyDownloadedProjects() {
@@ -216,69 +282,32 @@ public class DownloadAllSubmissionsJob extends ReviewerJobs {
         }
     }
     /**
-     * Creates the workingset and adds the projects.
-     * @param workingsetmanager
-     */
-    private void createWorkingSetAndAddProjects(IWorkingSetManager workingsetmanager) {
-        IProject[] projectsArray = new IProject[this.projects.size()];
-        for (int i = 0; i < this.projects.size(); i++) {
-            if (this.projects.get(i).isSucceeded()) {
-                projectsArray[i] = this.projects.get(i).getProject().get();
-            }
-        }
-
-        IWorkingSet[] sets = workingsetmanager.getAllWorkingSets();
-
-        boolean alreadyExisting = false;
-
-        for (IWorkingSet element : sets) {
-            if (element.getName().equals(this.assignment.getName())) {
-                element.setElements(projectsArray);
-                alreadyExisting = true;
-                break;
-            }
-        }
-
-        if (!alreadyExisting) {
-            IWorkingSet newSet = workingsetmanager.createWorkingSet(this.assignment.getName(), projectsArray);          
-            workingsetmanager.addWorkingSet(newSet);
-            //TODO: need to refresh gui or something
-        }
-    }
-
-    /**
-     * Creates the IProject.
+     * Copies the project from the temp folder to the project folder.
      *
-     * @param project
-     * @return boolean , true if it worked.
-     * @throws CoreException
+     * @param source
+     * @param target
+     * @throws IOException
      */
-    private boolean createIProject(Project project) throws CoreException {
-        boolean isCreated = false;
-
-        String groupname = project.getGroupName();
-        String projectName = "Submission from " + groupname + " for " + assignment.getName();
-        IWorkspace workspace = ResourcesPlugin.getWorkspace();
-        IWorkspaceRoot root = workspace.getRoot();
-        IProject newProject = root.getProject(projectName);
-        newProject.create(null);
-        newProject.open(null);
-        project.setIProject(newProject);
-        isCreated = true;
-
-
+    private void copyProject(Path source, Path target) throws IOException {
         try {
-            IProjectDescription description = newProject.getDescription();
-            description.setNatureIds(new String[] {"org.eclipse.jdt.core.javanature"});
-            newProject.setDescription(description, null);
-        } catch (CoreException e) {
-            EclipseLog.warning("Failed to set java nature for new project: " + e.getMessage());
+            Files.walk(source).forEach(sourceFile -> {
+                Path targetFile = target.resolve(source.relativize(sourceFile));
+    
+                try {
+                    if (Files.isDirectory(sourceFile)) {
+                        if (!Files.exists(targetFile)) {
+                            Files.createDirectory(targetFile);
+                        }
+                    } else {
+                        Files.copy(sourceFile, targetFile, StandardCopyOption.REPLACE_EXISTING);
+                    }
+                } catch (IOException e) {
+                    throw new UncheckedIOException(e);
+                }
+            });
+        } catch (UncheckedIOException e) {
+            throw e.getCause();
         }
-
-        Activator.getDefault().getProjectManager()
-        .setConnection(project.getProject().get(), groupname, assignment.getManagementId());
-
-        return isCreated;
     }
 
     /**
@@ -294,35 +323,6 @@ public class DownloadAllSubmissionsJob extends ReviewerJobs {
             Files.copy(in, targetDirectory.resolve(".classpath"));
         } else {
             throw new IOException(".classpath resource not found");
-        }
-    }
-
-    /**
-     * Copies the project from the temp folder to the project folder.
-     *
-     * @param source
-     * @param target
-     * @throws IOException
-     */
-    private void copyProject(Path source, Path target) throws IOException {
-        try {
-            Files.walk(source).forEach(sourceFile -> {
-                Path targetFile = target.resolve(source.relativize(sourceFile));
-
-                try {
-                    if (Files.isDirectory(sourceFile)) {
-                        if (!Files.exists(targetFile)) {
-                            Files.createDirectory(targetFile);
-                        }
-                    } else {
-                        Files.copy(sourceFile, targetFile, StandardCopyOption.REPLACE_EXISTING);
-                    }
-                } catch (IOException e) {
-                    throw new UncheckedIOException(e);
-                }
-            });
-        } catch (UncheckedIOException e) {
-            throw e.getCause();
         }
     }
 

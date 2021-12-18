@@ -79,12 +79,12 @@ public class CourseSelectionDialog extends Dialog {
     @Override
     protected void configureShell(Shell newShell) {
         super.configureShell(newShell);
-        newShell.setText("Download Submissions Result");
+        newShell.setText("Course Selection Dialog");
     }
 
     @Override
     protected Point getInitialSize() {
-        return new Point(220, 170);
+        return new Point(240, 120);
     }
 
     /**
