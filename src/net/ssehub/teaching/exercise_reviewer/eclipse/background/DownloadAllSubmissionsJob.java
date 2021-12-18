@@ -147,7 +147,7 @@ public class DownloadAllSubmissionsJob extends ReviewerJobs {
     protected void runAsync(IProgressMonitor monitor) {
         monitor.beginTask("Download submissions", 100);
         IWorkingSetManager workingsetmanager = PlatformUI.getWorkbench().getWorkingSetManager();
-
+        EclipseLog.info("Starting download Submissions");
         try {
             ExerciseSubmitterManager manager = Activator.getDefault().getManager();
             IApiConnection api = manager.getStudentManagementConnection();
@@ -172,6 +172,7 @@ public class DownloadAllSubmissionsJob extends ReviewerJobs {
            
 
         } catch (ApiException e) {
+            EclipseLog.error(e.getMessage());
             Display.getDefault().syncExec(() -> {
                 ExceptionDialog.showUnexpectedExceptionDialog(e, "Cant download all submissions");
             });

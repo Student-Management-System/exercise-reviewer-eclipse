@@ -12,6 +12,7 @@ import org.eclipse.ui.IWorkbenchPreferencePage;
 
 import net.ssehub.teaching.exercise_reviewer.eclipse.Activator;
 import net.ssehub.teaching.exercise_reviewer.eclipse.dialog.ExceptionDialog;
+import net.ssehub.teaching.exercise_reviewer.eclipse.log.EclipseLog;
 
 
 /**
@@ -64,7 +65,7 @@ public class PreferencePage extends FieldEditorPreferencePage implements IWorkbe
 
     @Override
     public boolean performOk() {
-        
+        EclipseLog.info("Saving preferences");
         try {
             SECURE_PREFERENCES.put(KEY_USERNAME, this.username.getStringValue(), false);
             SECURE_PREFERENCES.put(KEY_PASSWORD, this.password.getStringValue(), true);

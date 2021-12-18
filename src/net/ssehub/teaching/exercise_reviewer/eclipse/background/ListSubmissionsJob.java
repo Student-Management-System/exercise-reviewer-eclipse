@@ -11,6 +11,7 @@ import org.eclipse.swt.widgets.Shell;
 
 import net.ssehub.teaching.exercise_reviewer.eclipse.Activator;
 import net.ssehub.teaching.exercise_reviewer.eclipse.dialog.ExceptionDialog;
+import net.ssehub.teaching.exercise_reviewer.eclipse.log.EclipseLog;
 import net.ssehub.teaching.exercise_submitter.lib.ExerciseSubmitterManager;
 import net.ssehub.teaching.exercise_submitter.lib.data.Assignment;
 import net.ssehub.teaching.exercise_submitter.lib.student_management_system.ApiException;
@@ -45,6 +46,7 @@ public class ListSubmissionsJob extends ReviewerJobs {
 
     @Override
     protected void runAsync(IProgressMonitor monitor) {
+        EclipseLog.info("Start list submission job");
         this.retrieveAssessmentList();
         this.callbackCheckSubmission.accept(this);
 
@@ -66,6 +68,7 @@ public class ListSubmissionsJob extends ReviewerJobs {
             });
 
         } catch (ApiException e) {
+            EclipseLog.error(e.getLocalizedMessage());
             Display.getDefault().syncExec(
                 () -> ExceptionDialog.showUnexpectedExceptionDialog(e, "Cant retrieve group list"));
         }
