@@ -521,7 +521,6 @@ public class ReviewView extends ViewPart {
                 });
             }
         } else {
-
             Display.getDefault().syncExec(() -> {
                 this.table.removeAll();
 
