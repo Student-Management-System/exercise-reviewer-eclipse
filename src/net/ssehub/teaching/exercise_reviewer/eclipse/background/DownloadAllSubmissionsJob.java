@@ -39,6 +39,7 @@ import net.ssehub.teaching.exercise_submitter.lib.data.Assignment;
 import net.ssehub.teaching.exercise_submitter.lib.replay.ReplayException;
 import net.ssehub.teaching.exercise_submitter.lib.replay.Replayer;
 import net.ssehub.teaching.exercise_submitter.lib.student_management_system.ApiException;
+import net.ssehub.teaching.exercise_submitter.lib.student_management_system.CourseNotSelectedException;
 import net.ssehub.teaching.exercise_submitter.lib.student_management_system.IApiConnection;
 
 /**
@@ -155,36 +156,14 @@ public class DownloadAllSubmissionsJob extends ReviewerJobs {
             SubMonitor submonitor = SubMonitor.convert(monitor, allGroups.size());
             List<Replayer> replayers = new LinkedList<>();
 
-            for (String group : allGroups) {
-                Project project = new Project(group);
-                try {
-                    Replayer replayer = manager.getReplayer(this.assignment, group);
-                    replayers.add(replayer);
-                    
-                    File temporaryCheckout = replayer.replayLatest();
-                    submonitor.split(1).done();
-                    project.setFile(temporaryCheckout);
-                    createIProject(project);
-                } catch (ReplayException | CoreException e) {
-                    project.setException(e);
-                }
-                this.projects.add(project);
-                submonitor.split(1).done();
-            }
+            replayProjects(manager, allGroups, submonitor, replayers);
 
             this.createWorkingSetAndAddProjects(workingsetmanager);
 
             copyDownloadedProjects();
                      
             
-            for (Replayer replayer : replayers) {
-                try {
-                    replayer.close();
-                } catch (IOException e) {
-                    // TODO Auto-generated catch block
-                    e.printStackTrace();
-                }
-            }
+            closeReplayer(replayers);
             
             Display.getDefault().syncExec(() -> {
                 DownloadAllResultDialog dialog = new DownloadAllResultDialog(getShell().orElse(new Shell()), projects);
@@ -196,6 +175,47 @@ public class DownloadAllSubmissionsJob extends ReviewerJobs {
             Display.getDefault().syncExec(() -> {
                 ExceptionDialog.showUnexpectedExceptionDialog(e, "Cant download all submissions");
             });
+        }
+    }
+    /**
+     * Replay the submission from the groups.
+     * @param manager
+     * @param allGroups
+     * @param submonitor
+     * @param replayers
+     * @throws CourseNotSelectedException
+     */
+    private void replayProjects(ExerciseSubmitterManager manager, List<String> allGroups, SubMonitor submonitor,
+            List<Replayer> replayers) throws CourseNotSelectedException {
+        for (String group : allGroups) {
+            Project project = new Project(group);
+            try {
+                Replayer replayer = manager.getReplayer(this.assignment, group);
+                replayers.add(replayer);
+                
+                File temporaryCheckout = replayer.replayLatest();
+                submonitor.split(1).done();
+                project.setFile(temporaryCheckout);
+                createIProject(project);
+            } catch (ReplayException | CoreException e) {
+                project.setException(e);
+            }
+            this.projects.add(project);
+            submonitor.split(1).done();
+        }
+    }
+    /**
+     * Close all replayer -> Deletes all temp folders.
+     * @param replayers
+     */
+    private void closeReplayer(List<Replayer> replayers) {
+        for (Replayer replayer : replayers) {
+            try {
+                replayer.close();
+            } catch (IOException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
         }
     }
     /**
