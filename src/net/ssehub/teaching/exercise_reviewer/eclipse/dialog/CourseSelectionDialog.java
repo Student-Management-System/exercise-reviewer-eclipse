@@ -4,14 +4,17 @@ import java.util.List;
 import java.util.Optional;
 
 import org.eclipse.jface.dialogs.Dialog;
+import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Point;
-import org.eclipse.swt.layout.FillLayout;
+import org.eclipse.swt.layout.GridData;
+import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 
 import net.ssehub.teaching.exercise_submitter.lib.data.Course;
@@ -41,15 +44,23 @@ public class CourseSelectionDialog extends Dialog {
     @Override
     protected Control createDialogArea(Composite parent) {
         Composite container = (Composite) super.createDialogArea(parent);
-        FillLayout fillLayout = new FillLayout();
-        container.setLayout(fillLayout);
+        container.setLayout(new GridLayout(4, false));
         
-        this.combo = new Combo(container, SWT.DROP_DOWN | SWT.READ_ONLY | SWT.SIMPLE);
+        new Label(container, SWT.NONE);
+        new Label(container, SWT.NONE);
+        new Label(container, SWT.NONE);
+        new Label(container, SWT.NONE);
+        new Label(container, SWT.NONE);
         
-        for (Course course : courseList) {
-            this.combo.add(course.getName());
-        }
-        this.combo.setLayout(fillLayout);
+        Label selectLabel = new Label(container, SWT.NONE);
+        selectLabel.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1));
+        selectLabel.setText("Select your Course:");
+        
+        new Label(container, SWT.NONE);
+        
+        Combo combo = new Combo(container, SWT.NONE);
+        combo.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
+        
         this.combo.select(0);
         createComboSelectionListener();
         this.combo.pack();
@@ -80,6 +91,12 @@ public class CourseSelectionDialog extends Dialog {
     protected void configureShell(Shell newShell) {
         super.configureShell(newShell);
         newShell.setText("Course Selection Dialog");
+    }
+    
+    @Override
+    protected void createButtonsForButtonBar(Composite parent) {
+        createButton(parent, IDialogConstants.OK_ID, IDialogConstants.OK_LABEL, true);
+        createButton(parent, IDialogConstants.CANCEL_ID, IDialogConstants.CANCEL_LABEL, false);
     }
 
     @Override
