@@ -16,7 +16,8 @@ import org.eclipse.swt.events.MenuAdapter;
 import org.eclipse.swt.events.MenuEvent;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
-import org.eclipse.swt.layout.FillLayout;
+import org.eclipse.swt.layout.GridData;
+import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
@@ -124,10 +125,34 @@ public class AllReviewableSubmissionsView extends ViewPart {
      * @param parent
      */
     private void createComponent(Composite parent) {
-        FillLayout fillLayout = new FillLayout(SWT.VERTICAL);
-        parent.setLayout(fillLayout);
-        this.swtList = new List(parent, SWT.BORDER | SWT.V_SCROLL | SWT.SINGLE);
+        parent.setLayout(new GridLayout(2, false));
+        new Label(parent, SWT.NONE);
+        
+        Label lblSelectAssignment = new Label(parent, SWT.NONE);
+        lblSelectAssignment.setText("Select Assignment:");
+        new Label(parent, SWT.NONE);
+        
+        combo = new Combo(parent, SWT.NONE);
+        combo.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
+        new Label(parent, SWT.NONE);
+        
+        swtList = new List(parent, SWT.BORDER);
+        GridData gd = new GridData(SWT.FILL, SWT.FILL, false, true, 1, 1);
+        gd.heightHint = 392;
+        gd.widthHint = 201;
+        swtList.setLayoutData(gd);
+             
+        createListSelectionListener();
 
+        this.createRightclickMenu();
+        this.createComboSelectionListener();
+
+    
+    }
+    /**
+     * Creates the selection listener for the list.
+     */
+    private void createListSelectionListener() {
         this.swtList.addSelectionListener(new SelectionListener() {
 
             @Override
@@ -157,12 +182,6 @@ public class AllReviewableSubmissionsView extends ViewPart {
 
             }
         });
-
-        this.createRightclickMenu();
-        this.createCombo(parent);
-
-        //        Submission
-
     }
 
     /**
@@ -249,12 +268,11 @@ public class AllReviewableSubmissionsView extends ViewPart {
     }
 
     /**
-     * Creats the combo widget.
+     * Creates the combo widget.
      *
-     * @param parent
+     * 
      */
-    private void createCombo(Composite parent) {
-        this.combo = new Combo(parent, SWT.DROP_DOWN | SWT.READ_ONLY | SWT.SIMPLE);
+    private void createComboSelectionListener() {
         this.combo.addSelectionListener(new SelectionListener() {
 
             @Override
