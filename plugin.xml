@@ -13,12 +13,21 @@
             name="Select Course"
             id="exercise-reviewer-eclipse.commands.SettingAction">
       </command>
+      <command
+            categoryId="exercise-reviewer-eclipse.commands.category"
+            name="Help"
+            id="exercise-reviewer-eclipse.commands.HelpAction">
+      </command>
    </extension>
    <extension
          point="org.eclipse.ui.handlers">
       <handler
             class="net.ssehub.teaching.exercise_reviewer.eclipse.actions.SettingAction"
             commandId="exercise-reviewer-eclipse.commands.SettingAction">
+      </handler>
+       <handler
+            class="net.ssehub.teaching.exercise_reviewer.eclipse.actions.HelpAction"
+            commandId="exercise-reviewer-eclipse.commands.HelpAction">
       </handler>
    </extension>
    <extension
@@ -36,12 +45,17 @@
             locationURI="menu:org.eclipse.ui.main.menu?after=additions">
          <menu
                id="exercise-reviewer-eclipse.menus.settings"
-               label="Exercises reviewer Settings"
+               label="Exercises Reviewer Settings"
                mnemonic="M">
             <command
                   commandId="exercise-reviewer-eclipse.commands.SettingAction"
                   id="exercise-reviewer-eclipse.menus.SettingAction"
                   mnemonic="S">
+            </command>
+             <command
+                  commandId="exercise-reviewer-eclipse.commands.HelpAction"
+                  id="exercise-reviewer-eclipse.menus.HelpAction"
+                  mnemonic="H">
             </command>
          </menu>
       </menuContribution>

@@ -70,7 +70,8 @@ public class ListSubmissionsJob extends ReviewerJobs {
         } catch (ApiException e) {
             EclipseLog.error(e.getLocalizedMessage());
             Display.getDefault().syncExec(
-                () -> ExceptionDialog.showUnexpectedExceptionDialog(e, "Cant retrieve group list"));
+                () -> ExceptionDialog.showUnexpectedExceptionDialog(e, 
+                        "Cant retrieve group list \n Check Internet connection"));
         }
     }
 
