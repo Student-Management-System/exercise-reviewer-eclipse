@@ -58,14 +58,27 @@ public class CourseSelectionDialog extends Dialog {
         
         new Label(container, SWT.NONE);
         
-        Combo combo = new Combo(container, SWT.NONE);
+        createCombo(container);
+           
+        return container;
+    }
+
+    /**
+     * Creates the combobox for the dialog.
+     * 
+     * @param container
+     */
+    private void createCombo(Composite container) {
+        combo = new Combo(container, SWT.NONE);
         combo.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
+        
+        for (Course course: courseList) {
+            this.combo.add(course.getName());
+        }
         
         this.combo.select(0);
         createComboSelectionListener();
         this.combo.pack();
-           
-        return container;
     }
     /**
      * Creates the selectionlistenr for the combobox.
@@ -101,7 +114,7 @@ public class CourseSelectionDialog extends Dialog {
 
     @Override
     protected Point getInitialSize() {
-        return new Point(240, 120);
+        return new Point(340, 140);
     }
 
     /**
