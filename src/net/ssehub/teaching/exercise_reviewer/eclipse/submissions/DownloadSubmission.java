@@ -24,7 +24,6 @@ import net.ssehub.teaching.exercise_submitter.lib.ExerciseSubmitterManager;
 import net.ssehub.teaching.exercise_submitter.lib.data.Assignment;
 import net.ssehub.teaching.exercise_submitter.lib.replay.ReplayException;
 import net.ssehub.teaching.exercise_submitter.lib.replay.Replayer;
-import net.ssehub.teaching.exercise_submitter.lib.student_management_system.CourseNotSelectedException;
 
 /**
  * Handles the download from a user submission.
@@ -59,7 +58,7 @@ public class DownloadSubmission {
      * @return Project
      * @throws CourseNotSelectedException
      */
-    public Project start() throws CourseNotSelectedException {
+    public Project start() {
         replay();       
         return project;    
     }
@@ -68,7 +67,7 @@ public class DownloadSubmission {
      * 
      * @throws CourseNotSelectedException
      */
-    private void replay() throws CourseNotSelectedException {
+    private void replay() {
         try {
             Replayer replayer = manager.getReplayer(this.assignment, groupname);
                    

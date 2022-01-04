@@ -1,6 +1,8 @@
 package net.ssehub.teaching.exercise_reviewer.eclipse.actions;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
@@ -8,6 +10,7 @@ import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.expressions.IEvaluationContext;
 import org.eclipse.equinox.security.storage.StorageException;
 import org.eclipse.jface.dialogs.MessageDialog;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.ISources;
 import org.eclipse.ui.IWorkbenchWindow;
 
@@ -19,8 +22,6 @@ import net.ssehub.teaching.exercise_reviewer.eclipse.dialog.ExceptionDialog;
 import net.ssehub.teaching.exercise_reviewer.eclipse.preferences.PreferencePage;
 import net.ssehub.teaching.exercise_submitter.lib.data.Course;
 import net.ssehub.teaching.exercise_submitter.lib.student_management_system.ApiException;
-
-import org.eclipse.swt.widgets.Display;
 
 /**
  * Sample action.
@@ -42,15 +43,15 @@ public class SettingAction extends AbstractHandler {
     
                 @Override
                 public List<Course> run() {
-                    List<Course> courses = null;
+                    Set<Course> courses = null;
                     try {
                         courses = Activator.getDefault().getManager().getStudentManagementConnection().getAllCourses();
                         
                     } catch (ApiException e) {
                         ExceptionDialog.showUnexpectedExceptionDialog(e, "Courses cant be downloaded");
                     }
-                    // TODO Auto-generated method stub
-                    return courses;
+                    List<Course> asList = new ArrayList<>(courses);
+                    return asList;
                 }
             };
         
@@ -81,7 +82,7 @@ public class SettingAction extends AbstractHandler {
                         PreferencePage.SECURE_PREFERENCES.put(PreferencePage.KEY_COURSEID,
                                 dialog.getSelectedCourse().get()
                                 .getId(), true);
-                        Activator.getDefault().getManager().setCourse(dialog.getSelectedCourse().get());
+                        Activator.getDefault().initManager();
                     } catch (StorageException e) {
                         ExceptionDialog
                            .showUnexpectedExceptionDialog(e, "Cant save courseid");

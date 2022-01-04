@@ -15,16 +15,14 @@ import org.eclipse.ui.IWorkingSet;
 import org.eclipse.ui.IWorkingSetManager;
 import org.eclipse.ui.PlatformUI;
 
-
 import net.ssehub.teaching.exercise_reviewer.eclipse.Activator;
-import net.ssehub.teaching.exercise_reviewer.eclipse.dialog.ExceptionDialog;
 import net.ssehub.teaching.exercise_reviewer.eclipse.dialog.DownloadAllResultDialog;
+import net.ssehub.teaching.exercise_reviewer.eclipse.dialog.ExceptionDialog;
 import net.ssehub.teaching.exercise_reviewer.eclipse.log.EclipseLog;
 import net.ssehub.teaching.exercise_reviewer.eclipse.submissions.DownloadSubmission;
 import net.ssehub.teaching.exercise_submitter.lib.ExerciseSubmitterManager;
 import net.ssehub.teaching.exercise_submitter.lib.data.Assignment;
 import net.ssehub.teaching.exercise_submitter.lib.student_management_system.ApiException;
-import net.ssehub.teaching.exercise_submitter.lib.student_management_system.CourseNotSelectedException;
 import net.ssehub.teaching.exercise_submitter.lib.student_management_system.IApiConnection;
 
 /**
@@ -166,7 +164,7 @@ public class DownloadAllSubmissionsJob extends ReviewerJobs {
      * @throws CourseNotSelectedException
      */
     private void replayProjects(ExerciseSubmitterManager manager,
-            List<String> allGroups, SubMonitor submonitor) throws CourseNotSelectedException {
+            List<String> allGroups, SubMonitor submonitor) {
         
         for (String group : allGroups) {
             Project project = new Project(group);
