@@ -7,6 +7,7 @@ import java.io.UncheckedIOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
+import java.util.List;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IProjectDescription;
@@ -16,9 +17,13 @@ import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.NullProgressMonitor;
+import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Shell;
 
 import net.ssehub.teaching.exercise_reviewer.eclipse.Activator;
 import net.ssehub.teaching.exercise_reviewer.eclipse.background.DownloadAllSubmissionsJob.Project;
+import net.ssehub.teaching.exercise_reviewer.eclipse.dialog.DownloadAllResultDialog;
+import net.ssehub.teaching.exercise_reviewer.eclipse.background.StuMgmtJob;
 import net.ssehub.teaching.exercise_reviewer.eclipse.log.EclipseLog;
 import net.ssehub.teaching.exercise_submitter.lib.ExerciseSubmitterManager;
 import net.ssehub.teaching.exercise_submitter.lib.data.Assignment;
@@ -167,6 +172,24 @@ public class DownloadSubmission {
             throw new IOException(".classpath resource not found");
         }
     }
-    
+    /**
+     * Called when stumgmtjob is ready.
+     * 
+     * @param job
+     */
+    public static void onFinishedStuMgmtJob(StuMgmtJob<List<Project>> job) {
+        Display.getDefault().syncExec(() -> createResultDialog(job.getShell().orElse(new Shell())
+                , job.getOutput()));
+    }
+    /**
+     * Creates the resultdialog.
+     * 
+     * @param shell
+     * @param projects
+     */
+    public static void createResultDialog(Shell shell, List<Project> projects) {
+        DownloadAllResultDialog dialog = new DownloadAllResultDialog(shell, projects);
+        dialog.open();
+    }
 
 }

@@ -42,7 +42,7 @@ public class DownloadAllSubmissionsJob extends ReviewerJobs {
      * @author lukas
      *
      */
-    public class Project {
+    public static class Project {
         private String groupName;
         private Optional<File> file = Optional.empty();
         private Optional<IProject> project = Optional.empty();
@@ -142,11 +142,7 @@ public class DownloadAllSubmissionsJob extends ReviewerJobs {
 
             this.createWorkingSetAndAddProjects(workingsetmanager);
 
-          
-            Display.getDefault().syncExec(() -> {
-                DownloadAllResultDialog dialog = new DownloadAllResultDialog(getShell().orElse(new Shell()), projects);
-                dialog.open();
-            });
+            DownloadSubmission.createResultDialog(this.getShell().orElse(new Shell()), this.projects);
            
 
         } catch (ApiException e) {
@@ -205,6 +201,7 @@ public class DownloadAllSubmissionsJob extends ReviewerJobs {
         if (!alreadyExisting) {
             IWorkingSet newSet = workingsetmanager.createWorkingSet(this.assignment.getName(), projectsArray);          
             workingsetmanager.addWorkingSet(newSet);
+            
             //TODO: need to refresh gui or something
         }
         

@@ -9,7 +9,6 @@ import java.util.Optional;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IToolBarManager;
-import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.MenuAdapter;
@@ -25,7 +24,6 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.List;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
-import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.part.ViewPart;
@@ -33,13 +31,16 @@ import org.osgi.framework.Bundle;
 
 import net.ssehub.teaching.exercise_reviewer.eclipse.Activator;
 import net.ssehub.teaching.exercise_reviewer.eclipse.background.DownloadAllSubmissionsJob;
+import net.ssehub.teaching.exercise_reviewer.eclipse.background.DownloadAllSubmissionsJob.Project;
 import net.ssehub.teaching.exercise_reviewer.eclipse.background.IRunnableStuMgmt;
 import net.ssehub.teaching.exercise_reviewer.eclipse.background.ListSubmissionsJob;
 import net.ssehub.teaching.exercise_reviewer.eclipse.background.StuMgmtJob;
 import net.ssehub.teaching.exercise_reviewer.eclipse.dialog.ExceptionDialog;
+import net.ssehub.teaching.exercise_reviewer.eclipse.submissions.DownloadSubmission;
 import net.ssehub.teaching.exercise_submitter.lib.ExerciseSubmitterManager;
 import net.ssehub.teaching.exercise_submitter.lib.data.Assignment;
 import net.ssehub.teaching.exercise_submitter.lib.student_management_system.ApiException;
+import net.ssehub.teaching.exercise_submitter.lib.student_management_system.CourseNotSelectedException;
 
 /**
  * This class creates the {@link AllReviewableSubmissionsView} which contains a
@@ -211,9 +212,9 @@ public class AllReviewableSubmissionsView extends ViewPart {
 
                     @Override
                     public void widgetSelected(SelectionEvent arg0) {
-                        MessageDialog.openInformation(new Shell(), "test",
-                                AllReviewableSubmissionsView.this.swtList.getItem(selected));
-
+                        clickRightMenue(AllReviewableSubmissionsView.this.swtList
+                               .getItem(AllReviewableSubmissionsView.this.swtList.getSelectionIndex()));
+                            
                     }
 
                     @Override
@@ -266,7 +267,38 @@ public class AllReviewableSubmissionsView extends ViewPart {
             job.schedule();
         }
     }
-
+    /**
+     * Called when the right click menue button is activated.
+     * @param groupname
+     */
+    private void clickRightMenue(String groupname) {
+        if (this.selectedAssignment.isPresent()) {
+            IRunnableStuMgmt<java.util.List<Project>> func = 
+                    new IRunnableStuMgmt<java.util.List<Project>>() {
+                    @Override
+                    public java.util.List<Project> run() {
+                        java.util.List<Project> list = new java.util.ArrayList<Project>();
+                        Project project = new Project(groupname);
+                        list.add(project);
+                        ExerciseSubmitterManager manager = Activator.getDefault().getManager();
+                        DownloadSubmission submission = new DownloadSubmission(groupname,
+                                project, selectedAssignment.get(), manager);
+                        try {
+                            submission.start();
+                        } catch (CourseNotSelectedException e) {
+                            ExceptionDialog.showCourseSelectionFailed();
+                        }
+                        return list;
+                                
+                    }
+                };
+            StuMgmtJob<java.util.List<Project>> job = new StuMgmtJob<java.util.List<Project>>(groupname, func, 
+                    DownloadSubmission::onFinishedStuMgmtJob);
+            job.setUser(true);
+            job.schedule();
+        
+        }
+    }
     /**
      * Creates the combo widget.
      *
@@ -387,6 +419,7 @@ public class AllReviewableSubmissionsView extends ViewPart {
             });
         }
     }
+    
 
     /**
      * Gets the selected Assignment from the combobox.
