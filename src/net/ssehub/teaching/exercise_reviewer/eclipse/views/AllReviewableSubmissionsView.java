@@ -40,7 +40,6 @@ import net.ssehub.teaching.exercise_reviewer.eclipse.submissions.DownloadSubmiss
 import net.ssehub.teaching.exercise_submitter.lib.ExerciseSubmitterManager;
 import net.ssehub.teaching.exercise_submitter.lib.data.Assignment;
 import net.ssehub.teaching.exercise_submitter.lib.student_management_system.ApiException;
-import net.ssehub.teaching.exercise_submitter.lib.student_management_system.CourseNotSelectedException;
 
 /**
  * This class creates the {@link AllReviewableSubmissionsView} which contains a
@@ -283,11 +282,9 @@ public class AllReviewableSubmissionsView extends ViewPart {
                         ExerciseSubmitterManager manager = Activator.getDefault().getManager();
                         DownloadSubmission submission = new DownloadSubmission(groupname,
                                 project, selectedAssignment.get(), manager);
-                        try {
-                            submission.start();
-                        } catch (CourseNotSelectedException e) {
-                            ExceptionDialog.showCourseSelectionFailed();
-                        }
+                        
+                        submission.start();
+                        
                         return list;
                                 
                     }
