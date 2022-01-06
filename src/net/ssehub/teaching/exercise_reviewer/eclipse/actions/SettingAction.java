@@ -1,7 +1,9 @@
 package net.ssehub.teaching.exercise_reviewer.eclipse.actions;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Properties;
 import java.util.Set;
 
 import org.eclipse.core.commands.AbstractHandler;
@@ -21,6 +23,7 @@ import net.ssehub.teaching.exercise_reviewer.eclipse.dialog.CourseSelectionDialo
 import net.ssehub.teaching.exercise_reviewer.eclipse.dialog.ExceptionDialog;
 import net.ssehub.teaching.exercise_reviewer.eclipse.preferences.PreferencePage;
 import net.ssehub.teaching.exercise_submitter.lib.data.Course;
+import net.ssehub.teaching.exercise_submitter.lib.student_management_system.ApiConnection;
 import net.ssehub.teaching.exercise_submitter.lib.student_management_system.ApiException;
 
 /**
@@ -39,13 +42,32 @@ public class SettingAction extends AbstractHandler {
 
             window = (IWorkbenchWindow) context.getVariable(ISources.ACTIVE_WORKBENCH_WINDOW_NAME);
         
+            Properties prop = new Properties();
+            String username = "";
+            String password = "";
+            try {
+                username =  PreferencePage.SECURE_PREFERENCES.get(PreferencePage.KEY_USERNAME, "");   
+                password =  PreferencePage.SECURE_PREFERENCES.get(PreferencePage.KEY_PASSWORD, "");
+                prop.load(Activator.class.getResourceAsStream("config.properties"));
+            } catch (StorageException e1) {
+                ExceptionDialog.showPreferenceReadError();
+            } catch (IOException e) {
+                ExceptionDialog.showConfigFileReadError();
+            } 
+            
+            final String finalUsername = username;
+            final String finalPassword = password;
+            
             IRunnableStuMgmt<List<Course>> func = new IRunnableStuMgmt<List<Course>>() {
     
                 @Override
                 public List<Course> run() {
                     Set<Course> courses = null;
                     try {
-                        courses = Activator.getDefault().getManager().getStudentManagementConnection().getAllCourses();
+                        ApiConnection connection = new ApiConnection(prop.getProperty("authurl"), 
+                                prop.getProperty("mgmturl"));
+                        connection.login(finalUsername, finalPassword);
+                        courses = connection.getAllCourses();
                         
                     } catch (ApiException e) {
                         ExceptionDialog.showUnexpectedExceptionDialog(e, "Courses cant be downloaded");
