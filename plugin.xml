@@ -18,6 +18,11 @@
             name="Help"
             id="exercise-reviewer-eclipse.commands.HelpAction">
       </command>
+       <command
+            categoryId="exercise-reviewer-eclipse.commands.category"
+            name="Configure Settings"
+            id="exercise-reviewer-eclipse.commands.ConfigureAction">
+      </command>
    </extension>
    <extension
          point="org.eclipse.ui.handlers">
@@ -28,6 +33,10 @@
        <handler
             class="net.ssehub.teaching.exercise_reviewer.eclipse.actions.HelpAction"
             commandId="exercise-reviewer-eclipse.commands.HelpAction">
+      </handler>
+      <handler
+            class="net.ssehub.teaching.exercise_reviewer.eclipse.actions.ConfigureAction"
+            commandId="exercise-reviewer-eclipse.commands.ConfigureAction">
       </handler>
    </extension>
    <extension
@@ -56,6 +65,11 @@
                   commandId="exercise-reviewer-eclipse.commands.HelpAction"
                   id="exercise-reviewer-eclipse.menus.HelpAction"
                   mnemonic="H">
+            </command>
+             <command
+                  commandId="exercise-reviewer-eclipse.commands.ConfigureAction"
+                  id="exercise-reviewer-eclipse.menus.ConfigureAction"
+                  mnemonic="C">
             </command>
          </menu>
       </menuContribution>
