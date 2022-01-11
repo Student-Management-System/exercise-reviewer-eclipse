@@ -29,11 +29,10 @@ public class ProjectSelectionListener implements ISelectionListener {
             Object element = ((IStructuredSelection) newSelection).getFirstElement();
             if (element instanceof IAdaptable) {
                 IResource resource = ((IAdaptable) element).getAdapter(IResource.class);
-                if (resource != null) {
+                if (resource != null && Activator.getDefault().isConnected()) {
                     final IProject project = resource.getProject();
     
-                    try {
-    //                
+                    try {                       
                          
                         ReviewView reviewview = (ReviewView) PlatformUI.getWorkbench().getActiveWorkbenchWindow()
                               .getActivePage()
