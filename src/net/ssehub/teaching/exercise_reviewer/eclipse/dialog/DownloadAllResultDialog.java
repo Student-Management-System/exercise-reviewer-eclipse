@@ -27,6 +27,7 @@ import net.ssehub.teaching.exercise_reviewer.eclipse.background.DownloadAllSubmi
  */
 public class DownloadAllResultDialog extends Dialog {
     private List<Project> successProjects;
+    private List<Project> noSubmissionProjects;
     private List<Project> failedProjects;
     
     private Button openExceptionDialog;
@@ -55,11 +56,17 @@ public class DownloadAllResultDialog extends Dialog {
         String resultSuccededString = Integer.toString(this.successProjects.size());
         resultSucceded.setText(resultSuccededString);
 
+        new Label(container, SWT.NULL).setText("No submission:");
+        Label noSubmission = new Label(container, SWT.RIGHT);
+        noSubmission.setLayoutData(new GridData(GridData.HORIZONTAL_ALIGN_FILL));
+        String noSubmissionString = Integer.toString(this.noSubmissionProjects.size());
+        noSubmission.setText(noSubmissionString);
+        
         new Label(container, SWT.NULL).setText("Download failed:");
-        Label resultSuccededFailed = new Label(container, SWT.RIGHT);
-        resultSuccededFailed.setLayoutData(new GridData(GridData.HORIZONTAL_ALIGN_FILL));
-        String resultSuccededFailedString = Integer.toString(this.failedProjects.size());
-        resultSuccededFailed.setText(resultSuccededFailedString);
+        Label resultFailed = new Label(container, SWT.RIGHT);
+        resultFailed.setLayoutData(new GridData(GridData.HORIZONTAL_ALIGN_FILL));
+        String resultFailedString = Integer.toString(this.failedProjects.size());
+        resultFailed.setText(resultFailedString);
         
         new Label(container, SWT.NULL).setText("Reasons for failing:");
         this.openExceptionDialog = new Button(container, SWT.PUSH);
@@ -89,11 +96,14 @@ public class DownloadAllResultDialog extends Dialog {
      */
     private void sortProjects(List<Project> projects) {
         this.successProjects = new ArrayList<Project>();
+        this.noSubmissionProjects = new ArrayList<Project>();
         this.failedProjects = new ArrayList<Project>();
         
         for (Project project : projects) {
             if (project.isSucceeded()) {
                 this.successProjects.add(project);
+            } else if (project.isNoSubmission()) {
+                this.noSubmissionProjects.add(project);
             } else {
                 this.failedProjects.add(project);
             }
@@ -110,7 +120,7 @@ public class DownloadAllResultDialog extends Dialog {
 
     @Override
     protected Point getInitialSize() {
-        return new Point(220, 170);
+        return new Point(220, 200);
     }
 
 }

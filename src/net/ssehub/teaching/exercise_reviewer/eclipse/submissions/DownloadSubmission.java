@@ -73,19 +73,22 @@ public class DownloadSubmission {
      * @throws CourseNotSelectedException
      */
     private void replay() {
-        try {
-            Replayer replayer = manager.getReplayer(this.assignment, groupname);
-                   
-            File temporaryCheckout = replayer.replayLatest();
-        
-            project.setFile(temporaryCheckout);
+        try (Replayer replayer = manager.getReplayer(this.assignment, groupname)) {
             
-            createIProject();
-            
-            copyProject(project.getFile().get().toPath(), project.getProject().get().getLocation().toFile().toPath());
-            copyDefaultClasspath(project.getProject().get().getLocation().toFile().toPath());
-            project.getProject().get().refreshLocal(IResource.DEPTH_INFINITE, new NullProgressMonitor());
-            replayer.close();
+            if (replayer.getVersions().isEmpty()) {
+                project.setNoSubmission();
+            } else {
+                File temporaryCheckout = replayer.replayLatest();
+                
+                project.setFile(temporaryCheckout);
+                
+                createIProject();
+                
+                copyProject(project.getFile().get().toPath(),
+                        project.getProject().get().getLocation().toFile().toPath());
+                copyDefaultClasspath(project.getProject().get().getLocation().toFile().toPath());
+                project.getProject().get().refreshLocal(IResource.DEPTH_INFINITE, new NullProgressMonitor());
+            }
             
         } catch (ReplayException | CoreException | IOException e) {
             project.setException(e);
@@ -103,7 +106,7 @@ public class DownloadSubmission {
         boolean isCreated = false;
     
         String groupname = project.getGroupName();
-        String projectName = "Submission from " + groupname + " for " + assignment.getName();
+        String projectName = assignment.getName() + " " + groupname;
         IWorkspace workspace = ResourcesPlugin.getWorkspace();
         IWorkspaceRoot root = workspace.getRoot();
         IProject newProject = root.getProject(projectName);

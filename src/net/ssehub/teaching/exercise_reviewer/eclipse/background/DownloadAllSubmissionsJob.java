@@ -46,6 +46,7 @@ public class DownloadAllSubmissionsJob extends ReviewerJobs {
         private Optional<File> file = Optional.empty();
         private Optional<IProject> project = Optional.empty();
         private Optional<Exception> exception = Optional.empty();
+        private boolean noSubmission;
         /**
          * Creates a new instance of Project.
          * @param groupname
@@ -86,7 +87,7 @@ public class DownloadAllSubmissionsJob extends ReviewerJobs {
          * @return boolean
          */
         public boolean isSucceeded() {
-            return this.exception.isEmpty();
+            return this.exception.isEmpty() && !this.noSubmission;
         }
         /**
          * Gets the File.
@@ -109,7 +110,19 @@ public class DownloadAllSubmissionsJob extends ReviewerJobs {
         public String getGroupName() {
             return this.groupName;
         }
-
+        /**
+         * Indicates that there was no submission to this assignment by this group.
+         */
+        public void setNoSubmission() {
+            this.noSubmission = true;
+        }
+        /**
+         * Returns whether there was no assignment by this group to this assignment.
+         * @return Whether no submission has been made.
+         */
+        public boolean isNoSubmission() {
+            return noSubmission;
+        }
     }
 
     /**
