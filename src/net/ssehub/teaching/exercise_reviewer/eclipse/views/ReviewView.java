@@ -302,27 +302,39 @@ public class ReviewView extends ViewPart {
         ExerciseSubmitterManager manager = Activator.getDefault().getManager();
         IRunnableStuMgmt<Boolean> func = new IRunnableStuMgmt<Boolean>() {
            
-
             @Override
             public Boolean run() {
                 boolean success = true;
                 if (assignment.isPresent() && groupname.isPresent() && assessment.isPresent()) {
                     try {
-                        Assessment uploadAssessment = new Assessment();
-                        uploadAssessment.setManagementId(assessment.get().getManagementId().orElse(""));
-                        uploadAssessment.setComment(comment.orElse(new Comment("Not Available", page)).getComment());
-                        Display.getDefault().syncExec(() -> uploadAssessment.setPoints(
-                                Double.parseDouble(textPoints.getText())));
+                        String comment = ReviewView.this.comment.map(Comment::getComment).orElse("");
+                        Optional<Double> points;
+                        try {
+                            StringBuilder sb = new StringBuilder();
+                            Display.getDefault().syncExec(() -> sb.append(textPoints.getText()));
+                            points = Optional.of(Double.parseDouble(sb.toString()));
+                        } catch (NumberFormatException e) {
+                            points = Optional.empty();
+                        }
+                        
+                        Assessment assessment = ReviewView.this.assessment.get();
+                        assessment.setComment(comment);
+                        points.ifPresentOrElse(p -> {
+                            assessment.setPoints(p);
+                            assessment.setDraft(false);
+                        }, () -> assessment.setDraft(true));
+                        
                         AtomicBoolean questionResult = new AtomicBoolean();
                         Display.getDefault().syncExec(() ->  {
                             questionResult.set(MessageDialog.openQuestion(getSite().getShell(), "Uploading",
                                     "Assessment will be uploaded with following content: \n"
-                                    + "Comment: " + comment.orElse(new Comment("Not Available", page)) + "\n"
-                                    + "Points: " +  textPoints.getText()));     
+                                    + "Comment: " + assessment.getComment().orElse("(empty)") + "\n"
+                                    + "Points: " +  assessment.getPoints().map(String::valueOf)
+                                            .orElse("none (draft)")));     
                         });
                         if (questionResult.get()) {
                             manager.getStudentManagementConnection().uploadAssessment(manager.getCourse(),
-                                    assignment.get(), groupname.get(), uploadAssessment);
+                                    assignment.get(), groupname.get(), assessment);
                         } else {
                             success = false;
                         }
