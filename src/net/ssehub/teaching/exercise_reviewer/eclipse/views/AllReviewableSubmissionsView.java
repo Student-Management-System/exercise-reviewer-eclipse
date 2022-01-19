@@ -132,7 +132,7 @@ public class AllReviewableSubmissionsView extends ViewPart {
         lblSelectAssignment.setText("Select Assignment:");
         new Label(parent, SWT.NONE);
         
-        combo = new Combo(parent, SWT.NONE);
+        combo = new Combo(parent, SWT.DROP_DOWN | SWT.READ_ONLY);
         combo.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
         new Label(parent, SWT.NONE);
         
@@ -385,7 +385,7 @@ public class AllReviewableSubmissionsView extends ViewPart {
                 int indexToSelect = 0;
                 int index = 0;
                 for (Assignment assignment : this.assignments.get()) {
-                    this.combo.add(assignment.getName() + " " + assignment.getState());
+                    this.combo.add(assignment.getName() + " (" + assignment.getState() + ")");
                     if (assignment.getName().equals(previouslySelectedAssignmentName)) {
                         indexToSelect = index;
                     }
