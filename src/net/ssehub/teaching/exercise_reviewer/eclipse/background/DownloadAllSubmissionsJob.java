@@ -141,7 +141,9 @@ public class DownloadAllSubmissionsJob extends ReviewerJobs {
 
             this.createWorkingSetAndAddProjects(workingsetmanager);
 
-            DownloadSubmission.createResultDialog(this.getShell().orElse(new Shell()), this.projects);
+            Display.getDefault().syncExec(() -> {
+                DownloadSubmission.createResultDialog(this.getShell().orElse(new Shell()), this.projects);
+            });
            
 
         } catch (ApiException e) {
