@@ -69,14 +69,15 @@ public class CourseSelectionDialog extends Dialog {
      * @param container
      */
     private void createCombo(Composite container) {
-        combo = new Combo(container, SWT.NONE);
+        combo = new Combo(container, SWT.DROP_DOWN | SWT.READ_ONLY);
         combo.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
         
         for (Course course: courseList) {
-            this.combo.add(course.getName());
+            this.combo.add(course.getId());
         }
         
         this.combo.select(0);
+        this.selectedCourse = Optional.of(courseList.get(0));
         createComboSelectionListener();
         this.combo.pack();
     }
