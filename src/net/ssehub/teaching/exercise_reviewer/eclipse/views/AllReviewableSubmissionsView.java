@@ -49,7 +49,6 @@ import net.ssehub.teaching.exercise_submitter.lib.student_management_system.ApiE
  *
  */
 public class AllReviewableSubmissionsView extends ViewPart {
-    private Label label;
     private Action getAllSubmissionAction;
     private Action downloadAllSubmissionAction;
     private List swtList;

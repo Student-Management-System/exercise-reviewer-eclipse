@@ -34,7 +34,6 @@ public class DownloadAllSubmissionsJob extends ReviewerJobs {
 
     private Assignment assignment;
     private List<Project> projects = new ArrayList<Project>();
-    private IWorkbenchWindow window;
 
     /**
      * This class handles the project.
@@ -135,7 +134,6 @@ public class DownloadAllSubmissionsJob extends ReviewerJobs {
     public DownloadAllSubmissionsJob(Shell shell, Assignment assignment, IWorkbenchWindow window) {
         super("Download all Submissions", Optional.ofNullable(shell));
         this.assignment = assignment;
-        this.window = window;
     }
 
     @Override
