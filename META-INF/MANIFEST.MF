@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Exercise-reviewer-eclipse
 Bundle-SymbolicName: exercise-reviewer-eclipse;singleton:=true
-Bundle-Version: 0.0.1.qualifier
+Bundle-Version: 2.0.0
 Bundle-Activator: net.ssehub.teaching.exercise_reviewer.eclipse.Activator
 Require-Bundle: org.eclipse.ui,
  org.eclipse.core.runtime,
