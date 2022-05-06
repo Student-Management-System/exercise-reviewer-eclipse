@@ -115,7 +115,7 @@ public class CourseSelectionDialog extends Dialog {
 
     @Override
     protected Point getInitialSize() {
-        return new Point(340, 140);
+        return new Point(800, 800);
     }
 
     /**
