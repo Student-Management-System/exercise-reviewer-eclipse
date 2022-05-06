@@ -8,7 +8,6 @@ import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
-import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Combo;
@@ -59,6 +58,8 @@ public class CourseSelectionDialog extends Dialog {
         new Label(container, SWT.NONE);
         
         createCombo(container);
+        
+     
            
         return container;
     }
@@ -112,11 +113,12 @@ public class CourseSelectionDialog extends Dialog {
         createButton(parent, IDialogConstants.OK_ID, IDialogConstants.OK_LABEL, true);
         createButton(parent, IDialogConstants.CANCEL_ID, IDialogConstants.CANCEL_LABEL, false);
     }
-
+    
     @Override
-    protected Point getInitialSize() {
-        return new Point(340, 140);
+    protected boolean isResizable() {
+        return true;
     }
+    
 
     /**
      * Gets the selected Course.

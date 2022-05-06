@@ -7,7 +7,6 @@ import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
-import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
@@ -119,8 +118,9 @@ public class DownloadAllResultDialog extends Dialog {
     }
 
     @Override
-    protected Point getInitialSize() {
-        return new Point(220, 200);
+    protected boolean isResizable() {
+        return true;
     }
+    
 
 }

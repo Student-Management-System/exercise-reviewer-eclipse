@@ -4,7 +4,6 @@ import java.util.List;
 
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
@@ -82,10 +81,10 @@ public class ExceptionTableDialog extends Dialog {
         super.configureShell(newShell);
         newShell.setText("Failing reasons");
     }
-
+    
     @Override
-    protected Point getInitialSize() {
-        return new Point(400, 300);
+    protected boolean isResizable() {
+        return true;
     }
     
     
