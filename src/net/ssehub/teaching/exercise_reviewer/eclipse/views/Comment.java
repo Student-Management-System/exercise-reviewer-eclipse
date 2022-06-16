@@ -1,6 +1,8 @@
 package net.ssehub.teaching.exercise_reviewer.eclipse.views;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -54,7 +56,7 @@ public class Comment {
         if (this == obj) {
             return true;
         }
-        if (obj == null) {       
+        if (obj == null) {
             return false;
         }
         if (getClass() != obj.getClass()) {
@@ -90,7 +92,7 @@ public class Comment {
         fw.flush();
         fw.close();
     }
-    
+
     /**
      * Sets the current comment for the assessment.
      * 
@@ -128,18 +130,34 @@ public class Comment {
                 this.editor.get().doSave(new NullProgressMonitor());
             }
         });
-        String stringcomment = null;
-        try {
-            stringcomment = Files.readString(this.file.toPath());
-        } catch (IOException e) {
+        comment = readFileToString();
+        
+        return comment;
+
+    }
+    /**
+     * Reads the file from the path where its located to string. Includes special characters-
+     * 
+     * @return String
+     */
+    private String readFileToString() {
+        String fileString = "";
+        try (BufferedReader br = new BufferedReader(new FileReader(file))) {
+            String string;
+
+            while ((string = br.readLine()) != null) {
+                fileString += string;
+                fileString += "\n";
+            }
+            br.close();
+        } catch (IOException ex) {
+
             Display.getDefault().syncExec(() -> {
-                ExceptionDialog.showUnexpectedExceptionDialog(e, "Cant load comment");
-                
+                ExceptionDialog.showUnexpectedExceptionDialog(ex, "Cant load comment");
+
             });
         }
-        
-
-        return stringcomment;
+        return fileString;
 
     }
 
