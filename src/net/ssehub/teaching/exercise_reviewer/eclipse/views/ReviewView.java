@@ -74,6 +74,7 @@ public class ReviewView extends ViewPart {
 
     private Label labelUsers;
     private Label labelProject;
+    private Label labelPoints;
 
     private Button reviewButton;
 
@@ -84,7 +85,8 @@ public class ReviewView extends ViewPart {
     
     private Text textPoints;
 
-    private Optional<Comment> comment = Optional.empty();
+    private Comment comment;
+    
     private Optional<Assignment> assignment = Optional.empty();
     private Optional<String> groupname = Optional.empty();
     private Optional<Assessment> assessment = Optional.empty();
@@ -98,6 +100,7 @@ public class ReviewView extends ViewPart {
      */
     public ReviewView() {
         super();
+        comment = new Comment(page);
     }
 
     @Override
@@ -205,10 +208,12 @@ public class ReviewView extends ViewPart {
 
         this.reviewButton = new Button(group, SWT.PUSH);
         this.reviewButton.setText("Open Comment");
+        gridData = new GridData(GridData.HORIZONTAL_ALIGN_END);
+        gridData.horizontalSpan = 1;
         this.reviewButton.setLayoutData(gridData);
         this.clickopenReview();
         
-        Label labelPoints = new Label(group, 0);
+        this.labelPoints = new Label(group, 0);
         labelPoints.setText("Points:");
         gridData = new GridData(GridData.HORIZONTAL_ALIGN_BEGINNING);
         gridData.horizontalSpan = 1;
@@ -277,13 +282,13 @@ public class ReviewView extends ViewPart {
 
             @Override
             public void widgetSelected(SelectionEvent arg0) {
-                if (ReviewView.this.comment.isPresent()) {
+              
                     try {
-                        ReviewView.this.comment.get().openEditor();
+                        ReviewView.this.comment.openEditor();
                     } catch (PartInitException e) {
                         ExceptionDialog.showUnexpectedExceptionDialog(e, "Cant open Editor");
                     }
-                }
+                
 
             }
 
@@ -307,7 +312,7 @@ public class ReviewView extends ViewPart {
                 boolean success = true;
                 if (assignment.isPresent() && groupname.isPresent() && assessment.isPresent()) {
                     try {
-                        String comment = ReviewView.this.comment.map(Comment::getComment).orElse("");
+                        String comment = ReviewView.this.comment.getComment();
                         Optional<Double> points;
                         try {
                             StringBuilder sb = new StringBuilder();
@@ -460,10 +465,11 @@ public class ReviewView extends ViewPart {
        
 
         Display.getDefault().syncExec(() -> {
-            this.labelProject.setText(this.assignment.orElse(
-                    new Assignment("", "not available", State.SUBMISSION, true)).getName());
-        
+            Assignment localAssignment = this.assignment.orElse(
+                    new Assignment("", "not available", State.SUBMISSION, true));
+            this.labelProject.setText(localAssignment.getName());
             this.labelUsers.setText(this.groupname.orElse("not available"));
+            this.labelPoints.setText("Points: (MaxPoints: ");
         });
 
         ExerciseSubmitterManager manager = Activator.getDefault().getManager();
@@ -491,6 +497,7 @@ public class ReviewView extends ViewPart {
         
 
         Display.getDefault().syncExec(() -> {
+            this.reviewButton.pack();
             this.labelProject.pack();
             this.labelUsers.pack();
         });
@@ -504,7 +511,8 @@ public class ReviewView extends ViewPart {
     private void onFinishedStumgmtJob(StuMgmtJob<Assessment> job) {
         Assessment assessment = job.getOutput();
         if (assessment != null) {
-            this.comment = Optional.ofNullable(new Comment(assessment.getComment().orElse("Not Available"), page));
+            this.comment.setComment(assessment.getComment().orElse("not available"));
+                   
             this.assessment = Optional.ofNullable(assessment);
             if (assessment.getPoints().isPresent()) {
                 Display.getDefault().syncExec(() -> this.textPoints.setText(
@@ -547,7 +555,7 @@ public class ReviewView extends ViewPart {
         if (job.getOutput() != null && job.getOutput())  {
             Display.getDefault().syncExec(() -> {
                 MessageDialog.openInformation(job.getShell().orElse(new Shell()), "Upload Assessment", 
-                        "Assessment successfully uploadet");
+                        "Assessment successfully uploaded");
             });
         } else {
             Display.getDefault().syncExec(() -> {

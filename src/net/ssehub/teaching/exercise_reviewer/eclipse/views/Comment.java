@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.util.Objects;
 import java.util.Optional;
 
 import org.eclipse.core.filesystem.EFS;
@@ -35,23 +36,44 @@ public class Comment {
     /**
      * Creates an instance of comment.
      *
-     * @param comment
      * @param page
      */
-    public Comment(String comment, IWorkbenchPage page) {
-        this.comment = comment;
+    public Comment(IWorkbenchPage page) {
         this.page = page;
+        comment = "";
         this.createTempFile();
     }
 
+    @Override
+    public int hashCode() {
+        return Objects.hash(comment);
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {       
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        Comment other = (Comment) obj;
+        String one = comment;
+        String two = other.comment;
+        one.equals(two);
+        return comment.equals(other.comment);
+    }
+
     /**
-     * Creats an temporary file.
+     * Creates an temporary file.
      */
     private void createTempFile() {
         try {
             this.file = Files.createTempFile("comment", null).toFile();
             this.file.deleteOnExit();
-            this.writeCommentInFile();
         } catch (IOException e) {
             ExceptionDialog.showUnexpectedExceptionDialog(e, "Cant load comment");
         }
@@ -68,6 +90,22 @@ public class Comment {
         fw.flush();
         fw.close();
     }
+    
+    /**
+     * Sets the current comment for the assessment.
+     * 
+     * @param comment
+     */
+    public void setComment(String comment) {
+        if (!this.comment.equals(comment)) {
+            this.comment = comment;
+            try {
+                writeCommentInFile();
+            } catch (IOException e) {
+                ExceptionDialog.showUnexpectedExceptionDialog(e, "Cant save comment");
+            }
+        }
+    }
 
     /**
      * Opens the editor with the current comment.
@@ -77,7 +115,6 @@ public class Comment {
     public void openEditor() throws PartInitException {
         IFileStore fileStore = EFS.getLocalFileSystem().getStore(this.file.toURI());
         this.editor = Optional.ofNullable(IDE.openEditorOnFileStore(this.page, fileStore));
-
     }
 
     /**
