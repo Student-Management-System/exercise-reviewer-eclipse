@@ -11,6 +11,7 @@ import org.eclipse.swt.widgets.Shell;
 
 import net.ssehub.teaching.exercise_reviewer.eclipse.Activator;
 import net.ssehub.teaching.exercise_reviewer.eclipse.dialog.ExceptionDialog;
+import net.ssehub.teaching.exercise_reviewer.eclipse.exception.ManagerNotConnected;
 import net.ssehub.teaching.exercise_reviewer.eclipse.log.EclipseLog;
 import net.ssehub.teaching.exercise_submitter.lib.ExerciseSubmitterManager;
 import net.ssehub.teaching.exercise_submitter.lib.data.Assignment;
@@ -57,7 +58,13 @@ public class ListSubmissionsJob extends ReviewerJobs {
      */
     private void retrieveAssessmentList() {
 
-        ExerciseSubmitterManager manager = Activator.getDefault().getManager();
+        ExerciseSubmitterManager manager;
+        try {
+            manager = Activator.getDefault().getManager();
+        } catch (ManagerNotConnected e1) {
+            this.groupNames = Optional.empty();
+            return;
+        }
 
         try {
             this.groupNames = Optional.of(

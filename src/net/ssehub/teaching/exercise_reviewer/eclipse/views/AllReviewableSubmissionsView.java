@@ -36,6 +36,7 @@ import net.ssehub.teaching.exercise_reviewer.eclipse.background.IRunnableStuMgmt
 import net.ssehub.teaching.exercise_reviewer.eclipse.background.ListSubmissionsJob;
 import net.ssehub.teaching.exercise_reviewer.eclipse.background.StuMgmtJob;
 import net.ssehub.teaching.exercise_reviewer.eclipse.dialog.ExceptionDialog;
+import net.ssehub.teaching.exercise_reviewer.eclipse.exception.ManagerNotConnected;
 import net.ssehub.teaching.exercise_reviewer.eclipse.submissions.DownloadSubmission;
 import net.ssehub.teaching.exercise_submitter.lib.ExerciseSubmitterManager;
 import net.ssehub.teaching.exercise_submitter.lib.data.Assignment;
@@ -278,11 +279,15 @@ public class AllReviewableSubmissionsView extends ViewPart {
                         java.util.List<Project> list = new java.util.ArrayList<Project>();
                         Project project = new Project(groupname);
                         list.add(project);
-                        ExerciseSubmitterManager manager = Activator.getDefault().getManager();
-                        DownloadSubmission submission = new DownloadSubmission(groupname,
-                                project, selectedAssignment.get(), manager);
-                        
-                        submission.start();
+                        ExerciseSubmitterManager manager;
+                        try {
+                            manager = Activator.getDefault().getManager();
+                            DownloadSubmission submission = new DownloadSubmission(groupname,
+                                    project, selectedAssignment.get(), manager);
+                            submission.start();
+                        } catch (ManagerNotConnected e) {
+                            project.setException(e);
+                        }
                         
                         return list;
                                 
@@ -359,7 +364,7 @@ public class AllReviewableSubmissionsView extends ViewPart {
                     Display.getDefault().syncExec(() -> {
                         ExceptionDialog.showUnexpectedExceptionDialog(e, "Cant load assignments");
                     });
-                }
+                } catch (ManagerNotConnected e) { }
                 return assignments;
             }
 

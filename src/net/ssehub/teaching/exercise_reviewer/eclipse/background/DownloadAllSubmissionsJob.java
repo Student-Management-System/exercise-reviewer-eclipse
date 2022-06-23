@@ -17,6 +17,7 @@ import org.eclipse.ui.PlatformUI;
 
 import net.ssehub.teaching.exercise_reviewer.eclipse.Activator;
 import net.ssehub.teaching.exercise_reviewer.eclipse.dialog.ExceptionDialog;
+import net.ssehub.teaching.exercise_reviewer.eclipse.exception.ManagerNotConnected;
 import net.ssehub.teaching.exercise_reviewer.eclipse.log.EclipseLog;
 import net.ssehub.teaching.exercise_reviewer.eclipse.submissions.DownloadSubmission;
 import net.ssehub.teaching.exercise_submitter.lib.ExerciseSubmitterManager;
@@ -162,6 +163,9 @@ public class DownloadAllSubmissionsJob extends ReviewerJobs {
             Display.getDefault().syncExec(() -> {
                 ExceptionDialog.showUnexpectedExceptionDialog(e, "Cant download all submissions");
             });
+        } catch (ManagerNotConnected e) {
+            EclipseLog.error(e.getMessage());
+            ExceptionDialog.showConnectionCantBeEstabilished();
         }
     }
     /**

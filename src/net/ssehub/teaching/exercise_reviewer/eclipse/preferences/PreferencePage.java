@@ -71,7 +71,7 @@ public class PreferencePage extends FieldEditorPreferencePage implements IWorkbe
             SECURE_PREFERENCES.put(KEY_PASSWORD, this.password.getStringValue(), true);
             SECURE_PREFERENCES.flush();
             
-            Activator.getDefault().initManager();
+            Activator.getDefault().initManagerWithExceptionHandling();
             
         } catch (StorageException | IOException ex) {
             ExceptionDialog.showUnexpectedExceptionDialog(ex, "Failed to store preferences");

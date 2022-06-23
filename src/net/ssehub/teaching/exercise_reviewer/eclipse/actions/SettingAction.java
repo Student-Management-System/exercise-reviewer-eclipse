@@ -104,7 +104,7 @@ public class SettingAction extends AbstractHandler {
                         PreferencePage.SECURE_PREFERENCES.put(PreferencePage.KEY_COURSEID,
                                 dialog.getSelectedCourse().get()
                                 .getId(), true);
-                        Activator.getDefault().initManager();
+                        Activator.getDefault().initManagerWithExceptionHandling();
                     } catch (StorageException e) {
                         ExceptionDialog
                            .showUnexpectedExceptionDialog(e, "Cant save courseid");

@@ -12,7 +12,10 @@ import org.eclipse.ui.IWorkbenchWindow;
 import net.ssehub.teaching.exercise_reviewer.eclipse.Activator;
 import net.ssehub.teaching.exercise_reviewer.eclipse.background.IRunnableStuMgmt;
 import net.ssehub.teaching.exercise_reviewer.eclipse.background.StuMgmtJob;
+import net.ssehub.teaching.exercise_reviewer.eclipse.dialog.ExceptionDialog;
 import net.ssehub.teaching.exercise_reviewer.eclipse.dialog.HelpDialog;
+import net.ssehub.teaching.exercise_reviewer.eclipse.exception.ManagerNotConnected;
+import net.ssehub.teaching.exercise_submitter.lib.ExerciseSubmitterManager;
 import net.ssehub.teaching.exercise_submitter.lib.student_management_system.ApiException;
 
 /**
@@ -44,15 +47,23 @@ public class HelpAction extends AbstractHandler {
      * Creates a stumgmtjob to check if the user has tutorrights for a specific course.
      */
     private void createStuJob() {
+        ExerciseSubmitterManager manager;
+        try {
+            manager = Activator.getDefault().getManager();
+        } catch (ManagerNotConnected e1) {
+            ExceptionDialog.showConnectionCantBeEstabilished();
+            return;
+        }
+        
         IRunnableStuMgmt<Boolean> func = new IRunnableStuMgmt<Boolean>() {
             
             @Override
             public Boolean run() {
                 boolean result = false;
                 try {
-                    result = Activator.getDefault().getManager()
+                    result = manager
                             .getStudentManagementConnection()
-                            .hasTutorRights(Activator.getDefault().getManager().getCourse());
+                            .hasTutorRights(manager.getCourse());
                 } catch (ApiException | NullPointerException e) {
                     result = false;
                 }

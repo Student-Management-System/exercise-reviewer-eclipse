@@ -52,6 +52,7 @@ import net.ssehub.teaching.exercise_reviewer.eclipse.Activator;
 import net.ssehub.teaching.exercise_reviewer.eclipse.background.IRunnableStuMgmt;
 import net.ssehub.teaching.exercise_reviewer.eclipse.background.StuMgmtJob;
 import net.ssehub.teaching.exercise_reviewer.eclipse.dialog.ExceptionDialog;
+import net.ssehub.teaching.exercise_reviewer.eclipse.exception.ManagerNotConnected;
 import net.ssehub.teaching.exercise_reviewer.eclipse.listener.EditorFocusChangeListener;
 import net.ssehub.teaching.exercise_reviewer.eclipse.listener.ProjectSelectionListener;
 import net.ssehub.teaching.exercise_submitter.lib.ExerciseSubmitterManager;
@@ -254,7 +255,7 @@ public class ReviewView extends ViewPart {
             @Override
             public void run() {
                 
-                Activator.getDefault().getManager();
+                Activator.getDefault().reConnect();
                 
             }
         };
@@ -304,7 +305,14 @@ public class ReviewView extends ViewPart {
      */
     private void clickUpload() {
         
-        ExerciseSubmitterManager manager = Activator.getDefault().getManager();
+        ExerciseSubmitterManager manager;
+        try {
+            manager = Activator.getDefault().getManager();
+        } catch (ManagerNotConnected notConnected) {
+            ExceptionDialog.showConnectionCantBeEstabilished();
+            return;
+        }
+        
         IRunnableStuMgmt<Boolean> func = new IRunnableStuMgmt<Boolean>() {
            
             @Override
@@ -417,7 +425,15 @@ public class ReviewView extends ViewPart {
      */
     public void refreshReviewInformation(String groupName, String assignmentid) {
        
-        ExerciseSubmitterManager manager = Activator.getDefault().getManager();
+        ExerciseSubmitterManager manager;
+        try {
+            manager = Activator.getDefault().getManager();
+        } catch (ManagerNotConnected notConnected) {
+            this.labelProject.setText("Please reconnect");
+            this.labelProject.pack();
+            return;
+        }
+        
         IRunnableStuMgmt<Assignment> func = new IRunnableStuMgmt<Assignment>() {
 
             @Override
@@ -443,15 +459,11 @@ public class ReviewView extends ViewPart {
         
         this.groupname = Optional.ofNullable(groupName);
         
-        if (Activator.getDefault().isConnected()) {
-            StuMgmtJob<Assignment> getAssignmentjob = 
-                    new StuMgmtJob<Assignment>("getAssignment", func, this::onFinishedGetAssignment);
-            getAssignmentjob.setUser(true);
-            getAssignmentjob.schedule();
-        } else {
-            this.labelProject.setText("Please reconnect");
-            this.labelProject.pack();
-        }
+        StuMgmtJob<Assignment> getAssignmentjob = 
+                new StuMgmtJob<Assignment>("getAssignment", func, this::onFinishedGetAssignment);
+        getAssignmentjob.setUser(true);
+        getAssignmentjob.schedule();
+       
    
     }
     /**
@@ -472,7 +484,13 @@ public class ReviewView extends ViewPart {
             this.labelPoints.setText("Points: (MaxPoints: ");
         });
 
-        ExerciseSubmitterManager manager = Activator.getDefault().getManager();
+        ExerciseSubmitterManager manager;
+        try {
+            manager = Activator.getDefault().getManager();
+        } catch (ManagerNotConnected notConnected) {
+            return;
+        }
+        
         IRunnableStuMgmt<Assessment> func = new IRunnableStuMgmt<Assessment>() {
 
             @Override
