@@ -22,12 +22,11 @@ public class WaitForInternetConnection extends ReviewerJobs {
     /**
      * Creates a new instance of {@link WaitForInternetConnection}.
      * 
-     * @param name
      * @param shell
      * @param timeBetweenPingInSec
      */
-    public WaitForInternetConnection(String name, Optional<Shell> shell, int timeBetweenPingInSec) {
-        super(name, shell);
+    public WaitForInternetConnection(Optional<Shell> shell, int timeBetweenPingInSec) {
+        super("Exercise-Reviewer: Waiting for Internetconnection", shell);
         this.timeBetweenPingInSec = timeBetweenPingInSec;
         this.lastPingTime = LocalDateTime.now();
     }

@@ -151,7 +151,7 @@ public class Activator extends AbstractUIPlugin {
             this.isInit = true;
         } else {
             if (connectionJob == null) {
-                connectionJob = new WaitForInternetConnection(PLUGIN_ID, null, 10);
+                connectionJob = new WaitForInternetConnection(null, 10);
                 connectionJob.addJobChangeListener(new IJobChangeListener() {
 
                     @Override
