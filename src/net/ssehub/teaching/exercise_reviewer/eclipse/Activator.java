@@ -149,7 +149,7 @@ public class Activator extends AbstractUIPlugin {
         if (!this.isConnected && !this.isInit) {
             initManagerWithExceptionHandling();
             this.isInit = true;
-        } else {
+        } else if (!this.isConnected) {
             if (connectionJob == null) {
                 connectionJob = new WaitForInternetConnection(null, 10);
                 connectionJob.addJobChangeListener(new IJobChangeListener() {
