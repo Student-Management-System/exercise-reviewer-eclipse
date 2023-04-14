@@ -1,143 +1,145 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
-    <modelVersion>4.0.0</modelVersion>
-    <groupId>net.ssehub.teaching.exercise_reviewer</groupId>
-    <artifactId>exercise-reviewer-eclipse</artifactId>
-    <version>2.0.3</version>
-    <packaging>eclipse-plugin</packaging>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
 
-    <organization>
-        <name>Software Systems Engineering, University of Hildesheim</name>
-        <url>https://sse.uni-hildesheim.de/</url>
-    </organization>
+	<groupId>net.ssehub.teaching.exercise_reviewer</groupId>
+	<artifactId>exercise-reviewer-eclipse</artifactId>
+	<version>2.1.0</version>
+	<packaging>eclipse-plugin</packaging>
 
-    <licenses>
-        <license>
-            <name>Apache-2.0</name>
-            <url>https://www.apache.org/licenses/LICENSE-2.0.html</url>
-        </license>
-    </licenses>
+	<organization>
+		<name>Software Systems Engineering, University of Hildesheim</name>
+		<url>https://sse.uni-hildesheim.de/</url>
+	</organization>
 
-    <properties>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <tycho.version>2.5.0</tycho.version>
-    </properties>
+	<licenses>
+		<license>
+			<name>Apache-2.0</name>
+			<url>https://www.apache.org/licenses/LICENSE-2.0.html</url>
+		</license>
+	</licenses>
 
-    <repositories>
-        <repository>
-            <id>latest</id>
-            <layout>p2</layout>
-            <url>http://download.eclipse.org/releases/latest</url>
-        </repository>
-    </repositories>
+	<properties>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<tycho.version>3.0.4</tycho.version>
+	</properties>
 
-    <build>
-        <plugins>
-            <plugin>
-                <groupId>org.eclipse.tycho</groupId>
-                <artifactId>tycho-maven-plugin</artifactId>
-                <version>${tycho.version}</version>
-                <extensions>true</extensions>
-            </plugin>
+	<repositories>
+		<repository>
+			<id>latest</id>
+			<layout>p2</layout>
+			<url>http://download.eclipse.org/releases/latest</url>
+		</repository>
+	</repositories>
 
-            <plugin>
-                <groupId>org.eclipse.tycho</groupId>
-                <artifactId>tycho-compiler-plugin</artifactId>
-                <version>${tycho.version}</version>
-                <configuration>
-                    <release>11</release>
-                </configuration>
-            </plugin>
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.eclipse.tycho</groupId>
+				<artifactId>tycho-maven-plugin</artifactId>
+				<version>${tycho.version}</version>
+				<extensions>true</extensions>
+			</plugin>
 
-            <plugin>
-                <groupId>org.eclipse.tycho</groupId>
-                <artifactId>tycho-versions-plugin</artifactId>
-                <version>${tycho.version}</version>
-            </plugin>
+			<plugin>
+				<groupId>org.eclipse.tycho</groupId>
+				<artifactId>tycho-compiler-plugin</artifactId>
+				<version>${tycho.version}</version>
+				<configuration>
+					<release>17</release>
+				</configuration>
+			</plugin>
 
-
-            <plugin>
-                <groupId>org.eclipse.tycho</groupId>
-                <artifactId>target-platform-configuration</artifactId>
-                <version>${tycho.version}</version>
-                <configuration>
-                    <executionEnvironment>JavaSE-11</executionEnvironment>
-                    <environments>
-                        <environment>
-                            <os>win32</os>
-                            <ws>win32</ws>
-                            <arch>x86_64</arch>
-                        </environment>
-                        <environment>
-                            <os>linux</os>
-                            <ws>gtk</ws>
-                            <arch>x86_64</arch>
-                        </environment>
-                    </environments>
-                </configuration>
-            </plugin>
-
-            <plugin>
-                <artifactId>maven-dependency-plugin</artifactId>
-                <version>3.2.0</version>
-                <executions>
-                    <execution>
-                        <id>copy-dependencies</id>
-                        <phase>initialize</phase>
-                        <goals>
-                            <goal>copy-dependencies</goal>
-                        </goals>
-                        <configuration>
-                            <includeArtifactIds>exercise-submitter-lib</includeArtifactIds>
-                            <classifier>jar-with-dependencies</classifier>
-                            <stripVersion>true</stripVersion>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-
-            <plugin>
-                <artifactId>maven-checkstyle-plugin</artifactId>
-                <version>3.1.2</version>
-                <configuration>
-                    <configLocation>sse-checkstyle.xml</configLocation>
-                    <encoding>UTF-8</encoding>
-                    <failOnViolation>true</failOnViolation>
-                    <includeResources>false</includeResources>
-                    <includeTestResources>false</includeTestResources>
-                    <includeTestSourceDirectory>false</includeTestSourceDirectory>
-                    <sourceDirectories>
-                        <sourceDirectory>src</sourceDirectory>
-                    </sourceDirectories>
-                </configuration>
-                <executions>
-                    <execution>
-                        <id>checkstyle</id>
-                        <phase>validate</phase>
-                        <goals>
-                            <goal>check</goal>
-                        </goals>
-                    </execution>
-                </executions>
-                <dependencies>
-                    <dependency>
-                        <groupId>com.puppycrawl.tools</groupId>
-                        <artifactId>checkstyle</artifactId>
-                        <version>9.2</version>
-                    </dependency>
-                </dependencies>
-            </plugin>
+			<plugin>
+				<groupId>org.eclipse.tycho</groupId>
+				<artifactId>tycho-versions-plugin</artifactId>
+				<version>${tycho.version}</version>
+			</plugin>
 
 
-        </plugins>
-    </build>
+			<plugin>
+				<groupId>org.eclipse.tycho</groupId>
+				<artifactId>target-platform-configuration</artifactId>
+				<version>${tycho.version}</version>
+				<configuration>
+					<executionEnvironment>JavaSE-17</executionEnvironment>
+					<environments>
+						<environment>
+							<os>win32</os>
+							<ws>win32</ws>
+							<arch>x86_64</arch>
+						</environment>
+						<environment>
+							<os>linux</os>
+							<ws>gtk</ws>
+							<arch>x86_64</arch>
+						</environment>
+					</environments>
+				</configuration>
+			</plugin>
 
-    <dependencies>
-        <dependency>
-            <groupId>net.ssehub.teaching.exercise_submitter</groupId>
-            <artifactId>exercise-submitter-lib</artifactId>
-            <version>1.0.0</version>
-        </dependency>
-    </dependencies>
+			<plugin>
+				<artifactId>maven-dependency-plugin</artifactId>
+				<version>3.5.0</version>
+				<executions>
+					<execution>
+						<id>copy-dependencies</id>
+						<phase>initialize</phase>
+						<goals>
+							<goal>copy-dependencies</goal>
+						</goals>
+						<configuration>
+							<includeArtifactIds>exercise-submitter-lib</includeArtifactIds>
+							<classifier>jar-with-dependencies</classifier>
+							<stripVersion>true</stripVersion>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+
+			<plugin>
+				<artifactId>maven-checkstyle-plugin</artifactId>
+				<version>3.2.1</version>
+				<configuration>
+					<configLocation>sse-checkstyle.xml</configLocation>
+					<encoding>UTF-8</encoding>
+					<failOnViolation>true</failOnViolation>
+					<includeResources>false</includeResources>
+					<includeTestResources>false</includeTestResources>
+					<includeTestSourceDirectory>false</includeTestSourceDirectory>
+					<sourceDirectories>
+						<sourceDirectory>src</sourceDirectory>
+					</sourceDirectories>
+				</configuration>
+				<executions>
+					<execution>
+						<id>checkstyle</id>
+						<phase>validate</phase>
+						<goals>
+							<goal>check</goal>
+						</goals>
+					</execution>
+				</executions>
+				<dependencies>
+					<dependency>
+						<groupId>com.puppycrawl.tools</groupId>
+						<artifactId>checkstyle</artifactId>
+						<version>10.9.3</version>
+					</dependency>
+				</dependencies>
+			</plugin>
+
+
+		</plugins>
+	</build>
+
+	<dependencies>
+		<dependency>
+			<groupId>net.ssehub.teaching.exercise_submitter</groupId>
+			<artifactId>exercise-submitter-lib</artifactId>
+			<version>1.1.0</version>
+		</dependency>
+	</dependencies>
 
 </project>
     
